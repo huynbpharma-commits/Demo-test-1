@@ -3,16 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sohaco Workspace - Cổng thông tin & Hồ sơ Dược phẩm</title>
+  <title>Sohaco Workspace - Cổng làm việc số nội bộ</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Thư viện đọc/ghi file Excel (.xlsx/.xls/.csv) trực tiếp trên trình duyệt -->
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Inter', sans-serif; background-color: #f4f7fb; }
     .search-highlight { background-color: #fef08a; color: #854d0e; font-weight: 700; border-radius: 2px; padding: 0 1px; }
-    .module-btn-active { transform: translateY(-2px); box-shadow: 0 12px 24px -8px rgba(15, 76, 129, 0.28); border-color: #0284c7 !important; background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%); }
-    /* Custom scrollbar */
+    .accordion-card-open { border-color: #0284c7 !important; box-shadow: 0 10px 25px -8px rgba(2, 132, 199, 0.22); }
+    .accordion-header-open { background: linear-gradient(135deg, #f0f9ff 0%, #ffffff 100%); }
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: #f1f5f9; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
@@ -42,15 +44,14 @@
             <div>
               <div class="flex items-center gap-2">
                 <span class="font-extrabold text-lg tracking-tight text-sky-900">SOHACO</span>
-                <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-teal-50 text-teal-700 border border-teal-200">Pharma Workspace</span>
               </div>
-              <p class="text-xs text-slate-500">Hệ thống tài liệu, hồ sơ & quy trình nội bộ</p>
+              <p class="text-xs font-medium text-teal-700">Vững bước tương lai</p>
             </div>
           </div>
 
-          <!-- Mobile Admin Toggle -->
-          <button onclick="toggleAdminMode()" class="lg:hidden px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-300 bg-slate-50 hover:bg-slate-100" id="adminToggleBtnMobile">
-            Chế độ: Nhân viên
+          <!-- Mobile Admin Login Button -->
+          <button onclick="handleAdminAuthClick()" class="lg:hidden px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-300 bg-slate-50 hover:bg-slate-100" id="adminToggleBtnMobile">
+            Đăng nhập Admin
           </button>
         </div>
 
@@ -65,7 +66,7 @@
               id="globalSearchInput"
               oninput="handleGlobalSearch()"
               onfocus="handleGlobalSearch()"
-              placeholder="Tìm nhanh (vd: 'hsp', 'kkg', 'gdp', 'slide' - không cần gõ liền mạch)..."
+              placeholder="Tìm nhanh sản phẩm, hồ sơ, mã ATC, biểu mẫu (không cần gõ liền mạch)..."
               class="w-full px-3 py-2.5 bg-transparent text-sm text-slate-800 placeholder-slate-400 focus:outline-none"
             />
             <button id="clearSearchBtn" onclick="clearGlobalSearch()" class="hidden px-2 text-slate-400 hover:text-slate-600" title="Xóa tìm kiếm">
@@ -92,9 +93,9 @@
           <button onclick="document.getElementById('logoUploadInput').click()" class="px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-sky-700 hover:bg-sky-50 border border-slate-200 transition">
             Đổi Logo
           </button>
-          <button onclick="toggleAdminMode()" id="adminToggleBtnDesktop" class="px-3.5 py-2 rounded-xl text-xs font-semibold border border-slate-300 bg-slate-50 hover:bg-slate-100 text-slate-700 transition flex items-center gap-1.5">
+          <button onclick="handleAdminAuthClick()" id="adminToggleBtnDesktop" class="px-3.5 py-2 rounded-xl text-xs font-semibold border border-slate-300 bg-slate-50 hover:bg-slate-100 text-slate-700 transition flex items-center gap-1.5">
             <span class="w-2 h-2 rounded-full bg-emerald-500" id="modeIndicatorDot"></span>
-            <span id="modeIndicatorText">Chế độ: Nhân viên</span>
+            <span id="modeIndicatorText">Chế độ: Nhân viên (Đăng nhập Admin)</span>
           </button>
         </div>
       </div>
@@ -108,14 +109,14 @@
       <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
         <div class="max-w-3xl">
           <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-sm text-sky-100 text-xs font-medium mb-3 border border-white/20">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            Cổng làm việc số nội bộ ngành Dược
+            <svg class="w-3.5 h-3.5 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+            <span>Cổng làm việc số nội bộ</span>
           </div>
           <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight leading-snug">
             Chào mừng bạn đến với nơi làm việc chung của Sohaco
           </h1>
           <p class="mt-2.5 text-sky-100 text-sm sm:text-base max-w-2xl">
-            Tra cứu nhanh danh mục thuốc, trích xuất hồ sơ gửi khách hàng qua Zalo, cập nhật biểu mẫu GDP, slide đào tạo và hồ sơ kê khai giá Dược Việt Nam.
+            Nơi bạn có thể tối ưu công việc với khách hàng
           </p>
         </div>
 
@@ -123,11 +124,11 @@
         <div class="grid grid-cols-3 gap-3 shrink-0">
           <div class="bg-white/10 backdrop-blur border border-white/15 rounded-xl p-3 text-center">
             <div class="text-xl font-bold" id="statProducts">0</div>
-            <div class="text-[11px] text-sky-100">Sản phẩm</div>
+            <div class="text-[11px] text-sky-100">Hồ sơ SP</div>
           </div>
           <div class="bg-white/10 backdrop-blur border border-white/15 rounded-xl p-3 text-center">
             <div class="text-xl font-bold" id="statDocs">0</div>
-            <div class="text-[11px] text-sky-100">Hồ sơ & GDP</div>
+            <div class="text-[11px] text-sky-100">GDP & Pháp lý</div>
           </div>
           <div class="bg-white/10 backdrop-blur border border-white/15 rounded-xl p-3 text-center">
             <div class="text-xl font-bold" id="statSlides">0</div>
@@ -138,93 +139,28 @@
     </div>
   </section>
 
-  <!-- ==================== 6 DEDICATED FEATURE BUTTONS ==================== -->
+  <!-- ==================== 6 ACCORDION MODULES (DẠNG NẾP GẤP) ==================== -->
   <main class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1">
-    <div class="mb-2 flex items-center justify-between">
-      <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500">Chọn phân hệ làm việc (6 chức năng chính)</h2>
-      <span id="adminBannerBadge" class="hidden text-xs font-semibold px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 border border-amber-300">
-        Đang bật quyền Quản trị (Admin): Có thể thêm/sửa/cập nhật tài liệu
-      </span>
+    <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+      <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500">Các phân hệ làm việc (Bấm để mở/thu gọn từng mục)</h2>
+      <div id="adminBannerBadge" class="hidden flex items-center gap-2">
+        <span class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 border border-amber-300">
+          Đang đăng nhập quyền Quản trị (Admin)
+        </span>
+        <button onclick="openChangePasswordModal()" class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-white border border-slate-300 hover:bg-slate-50 text-slate-700">
+          Đổi mật khẩu
+        </button>
+      </div>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 mb-7" id="moduleButtonsGrid">
-      <!-- Nút 1 -->
-      <button onclick="switchModule('zalo-dossier')" id="btn-zalo-dossier" class="module-btn text-left p-4 rounded-2xl bg-white border-2 border-slate-200 hover:border-sky-400 transition-all flex items-start gap-3.5 shadow-sm">
-        <div class="w-11 h-11 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 font-bold shadow-sm">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
-        </div>
-        <div>
-          <div class="font-bold text-slate-900 text-sm sm:text-base">1. Trích xuất hồ sơ & Gửi Zalo</div>
-          <p class="text-xs text-slate-500 mt-0.5">Chọn nhanh hồ sơ sản phẩm cho Sale trích xuất gửi khách qua Zalo (VNG).</p>
-        </div>
-      </button>
-
-      <!-- Nút 2 -->
-      <button onclick="switchModule('training-slides')" id="btn-training-slides" class="module-btn text-left p-4 rounded-2xl bg-white border-2 border-slate-200 hover:border-sky-400 transition-all flex items-start gap-3.5 shadow-sm">
-        <div class="w-11 h-11 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 font-bold shadow-sm">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/></svg>
-        </div>
-        <div>
-          <div class="font-bold text-slate-900 text-sm sm:text-base">2. Slide đào tạo</div>
-          <p class="text-xs text-slate-500 mt-0.5">Chọn bài giảng, xem trước và cập nhật slide đào tạo sản phẩm, kỹ năng.</p>
-        </div>
-      </button>
-
-      <!-- Nút 3 -->
-      <button onclick="switchModule('product-catalog')" id="btn-product-catalog" class="module-btn text-left p-4 rounded-2xl bg-white border-2 border-slate-200 hover:border-sky-400 transition-all flex items-start gap-3.5 shadow-sm">
-        <div class="w-11 h-11 rounded-xl bg-teal-600 text-white flex items-center justify-center shrink-0 font-bold shadow-sm">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-        </div>
-        <div>
-          <div class="font-bold text-slate-900 text-sm sm:text-base">3. Danh mục sản phẩm</div>
-          <p class="text-xs text-slate-500 mt-0.5">Xem danh mục thuốc Sohaco, tải bảng thông tin & gửi cho khách hàng.</p>
-        </div>
-      </button>
-
-      <!-- Nút 4 -->
-      <button onclick="switchModule('gdp-forms')" id="btn-gdp-forms" class="module-btn text-left p-4 rounded-2xl bg-white border-2 border-slate-200 hover:border-sky-400 transition-all flex items-start gap-3.5 shadow-sm">
-        <div class="w-11 h-11 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 font-bold shadow-sm">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-        </div>
-        <div>
-          <div class="font-bold text-slate-900 text-sm sm:text-base">4. Biểu mẫu GDP</div>
-          <p class="text-xs text-slate-500 mt-0.5">Cập nhật & tải các SOP, biểu mẫu Thực hành tốt phân phối thuốc (GDP).</p>
-        </div>
-      </button>
-
-      <!-- Nút 5 -->
-      <button onclick="switchModule('feedback')" id="btn-feedback" class="module-btn text-left p-4 rounded-2xl bg-white border-2 border-slate-200 hover:border-sky-400 transition-all flex items-start gap-3.5 shadow-sm">
-        <div class="w-11 h-11 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 font-bold shadow-sm">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-        </div>
-        <div>
-          <div class="font-bold text-slate-900 text-sm sm:text-base">5. Ý kiến đóng góp (Google Sheet)</div>
-          <p class="text-xs text-slate-500 mt-0.5">Ghi nhận góp ý, kết nối Google Excel & tải file báo cáo định kỳ cho Admin.</p>
-        </div>
-      </button>
-
-      <!-- Nút 6 -->
-      <button onclick="switchModule('legal-pricing')" id="btn-legal-pricing" class="module-btn text-left p-4 rounded-2xl bg-white border-2 border-slate-200 hover:border-sky-400 transition-all flex items-start gap-3.5 shadow-sm">
-        <div class="w-11 h-11 rounded-xl bg-rose-600 text-white flex items-center justify-center shrink-0 font-bold shadow-sm">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/></svg>
-        </div>
-        <div>
-          <div class="font-bold text-slate-900 text-sm sm:text-base">6. Pháp lý & Kê khai giá Dược</div>
-          <p class="text-xs text-slate-500 mt-0.5">Trích xuất hồ sơ pháp lý công ty & hồ sơ kê khai giá thuốc tại Việt Nam.</p>
-        </div>
-      </button>
-    </div>
-
-    <!-- ==================== ACTIVE MODULE WORKSPACE ==================== -->
-    <div id="workspaceContainer" class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 sm:p-6 min-h-[420px]">
-      <!-- Dynamic Content Rendered Here -->
-    </div>
+    <!-- Container chứa 6 nếp gấp phân hệ -->
+    <div id="accordionWorkspace" class="space-y-3.5"></div>
   </main>
 
   <!-- ==================== FOOTER ==================== -->
   <footer class="bg-white border-t border-slate-200 py-4 mt-10">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
-      <span>© 2026 Sohaco Internal Workspace. Phát triển phục vụ công việc nội bộ & đội ngũ Kinh doanh Dược.</span>
+      <span>© 2026 Sohaco Workspace. Vững bước tương lai.</span>
       <div class="flex items-center gap-3">
         <button onclick="exportAllBackup()" class="hover:text-sky-700 underline">Sao lưu dữ liệu (JSON)</button>
         <button onclick="resetDemoData()" class="hover:text-rose-600 underline">Khôi phục dữ liệu mẫu</button>
@@ -233,41 +169,118 @@
   </footer>
 
   <!-- ==================== MODALS ==================== -->
-  <!-- Zalo Share / Extract Modal -->
-  <div id="zaloModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden border border-slate-200">
-      <div class="bg-blue-600 text-white px-5 py-4 flex items-center justify-between">
-        <div class="flex items-center gap-2.5">
-          <span class="font-extrabold text-lg bg-white text-blue-600 px-2 py-0.5 rounded-lg">Zalo</span>
-          <h3 class="font-bold text-base">Trích xuất & Gửi cho khách hàng</h3>
-        </div>
-        <button onclick="closeModal('zaloModal')" class="text-white/80 hover:text-white text-xl leading-none">✕</button>
+
+  <!-- 1. Modal Đăng nhập Admin (Không tự động điền mật khẩu) -->
+  <div id="adminLoginModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full shadow-2xl overflow-hidden border border-slate-200">
+      <div class="bg-sky-900 text-white px-5 py-4 flex items-center justify-between">
+        <h3 class="font-bold text-base">Đăng nhập quyền Quản trị (Admin)</h3>
+        <button onclick="closeModal('adminLoginModal')" class="text-white/80 hover:text-white text-xl leading-none">✕</button>
       </div>
+      <form onsubmit="submitAdminLogin(event)" autocomplete="off" class="p-5 space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Tên đăng nhập</label>
+          <input type="text" id="loginUsername" required autocomplete="off" placeholder="Nhập tài khoản quản trị" class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm focus:border-sky-500 focus:outline-none" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Mật khẩu</label>
+          <input type="password" id="loginPassword" required autocomplete="new-password" placeholder="Nhập mật khẩu" class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm focus:border-sky-500 focus:outline-none" />
+        </div>
+        <div id="loginErrorMsg" class="hidden text-xs font-semibold text-rose-600 bg-rose-50 border border-rose-200 rounded-lg px-3 py-2">
+          Tên đăng nhập hoặc mật khẩu không đúng!
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeModal('adminLoginModal')" class="px-4 py-2 rounded-xl text-xs font-semibold border border-slate-300 text-slate-600 hover:bg-slate-50">Hủy</button>
+          <button type="submit" class="px-5 py-2 rounded-xl text-xs font-bold bg-sky-700 hover:bg-sky-800 text-white shadow">Đăng nhập</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. Modal Đổi mật khẩu Admin -->
+  <div id="changePasswordModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full shadow-2xl overflow-hidden border border-slate-200">
+      <div class="bg-slate-800 text-white px-5 py-4 flex items-center justify-between">
+        <h3 class="font-bold text-base">Đổi mật khẩu Admin</h3>
+        <button onclick="closeModal('changePasswordModal')" class="text-white/80 hover:text-white text-xl leading-none">✕</button>
+      </div>
+      <form onsubmit="submitChangePassword(event)" autocomplete="off" class="p-5 space-y-3.5">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Mật khẩu hiện tại</label>
+          <input type="password" id="oldAdminPass" required autocomplete="new-password" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:border-sky-500 focus:outline-none" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Mật khẩu mới</label>
+          <input type="password" id="newAdminPass" required minlength="6" autocomplete="new-password" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:border-sky-500 focus:outline-none" />
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeModal('changePasswordModal')" class="px-4 py-2 rounded-xl text-xs font-semibold border border-slate-300 text-slate-600">Hủy</button>
+          <button type="submit" class="px-4 py-2 rounded-xl text-xs font-bold bg-sky-700 hover:bg-sky-800 text-white">Cập nhật</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 3. Modal Thông tin gửi khách (Góc trái là Logo Sohaco) -->
+  <div id="sendCustomerModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden border border-slate-200">
+      <div class="bg-gradient-to-r from-sky-800 to-teal-700 text-white px-5 py-3.5 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center overflow-hidden border border-white/30 shadow-sm shrink-0">
+            <img id="modalLogoImg" src="" alt="Logo Sohaco" class="hidden w-full h-full object-contain p-1" />
+            <span id="modalLogoFallback" class="text-sky-800 font-extrabold text-xs">SOHACO</span>
+          </div>
+          <div>
+            <h3 class="font-bold text-base leading-tight">Thông tin gửi khách</h3>
+            <p class="text-[11px] text-sky-100">Sohaco - Vững bước tương lai</p>
+          </div>
+        </div>
+        <button onclick="closeModal('sendCustomerModal')" class="text-white/80 hover:text-white text-xl leading-none">✕</button>
+      </div>
+
       <div class="p-5 space-y-4">
         <div>
-          <label class="block text-xs font-bold text-slate-600 uppercase mb-1.5">Nội dung trích xuất đã tạo sẵn:</label>
-          <textarea id="zaloMessageText" rows="7" class="w-full rounded-xl border border-slate-300 p-3 text-sm bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none"></textarea>
+          <label class="block text-xs font-bold text-slate-600 uppercase mb-1.5">Nội dung gửi khách hàng:</label>
+          <textarea id="customerShareText" rows="7" class="w-full rounded-xl border border-slate-300 p-3 text-sm bg-slate-50 focus:bg-white focus:border-sky-500 focus:outline-none leading-relaxed"></textarea>
         </div>
-        <div class="bg-blue-50 border border-blue-200 rounded-xl p-3 text-xs text-blue-800">
-          <strong>Hướng dẫn gửi nhanh:</strong> Bấm <em>"Sao chép & Mở Zalo"</em> để copy sẵn nội dung (kèm link tải file), sau đó dán (Ctrl+V) vào khung chat với khách hàng trên Zalo PC/Web hoặc App điện thoại.
+
+        <!-- Lựa chọn ứng dụng trên máy tính -->
+        <div id="desktopShareOptions" class="hidden bg-sky-50 border border-sky-200 rounded-xl p-3.5 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-sky-900">Chọn ứng dụng để gửi (Nội dung đã được sao chép sẵn):</span>
+            <button onclick="document.getElementById('desktopShareOptions').classList.add('hidden')" class="text-xs text-slate-400 hover:text-slate-600">Ẩn</button>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <button onclick="launchZaloDesktopOrWeb()" class="flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-sm">
+              <span>Ứng dụng Zalo (PC / Web)</span>
+            </button>
+            <button onclick="launchMailClient()" class="flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-900 text-white shadow-sm">
+              <span>Ứng dụng Mail trên máy</span>
+            </button>
+            <button onclick="launchGmailWeb()" class="flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white shadow-sm">
+              <span>Gmail trực tuyến</span>
+            </button>
+            <button onclick="trySystemWebShare()" class="flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold bg-teal-600 hover:bg-teal-700 text-white shadow-sm">
+              <span>Chia sẻ khác trên máy</span>
+            </button>
+          </div>
+          <p class="text-[11px] text-sky-800">Mẹo: Khi mở Zalo, bạn chỉ cần nhấn <strong>Ctrl + V</strong> vào ô chat khách hàng để dán ngay nội dung.</p>
         </div>
-        <div class="flex flex-wrap items-center justify-end gap-2.5 pt-2">
-          <button onclick="downloadExtractedText()" class="px-3.5 py-2 rounded-xl text-xs font-semibold border border-slate-300 hover:bg-slate-100 text-slate-700">
-            Tải file tóm tắt (.txt)
+
+        <div class="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100">
+          <button onclick="copyCustomerShareText()" class="px-4 py-2.5 rounded-xl text-xs font-bold border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 transition">
+            Sao chép nội dung
           </button>
-          <button onclick="copyZaloTextOnly()" class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-900 text-white">
-            Chỉ sao chép nội dung
-          </button>
-          <button onclick="copyAndOpenZalo()" class="px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white shadow flex items-center gap-1.5">
-            <span>Sao chép & Mở Zalo</span>
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+          <button onclick="handleSendToCustomerAction()" class="px-5 py-2.5 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white shadow flex items-center gap-1.5 transition">
+            <span>Gửi</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
           </button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Admin Add/Edit Item Modal -->
+  <!-- 4. Admin Add/Edit Item Modal -->
   <div id="adminItemModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-xl w-full shadow-2xl overflow-hidden border border-slate-200 max-h-[90vh] flex flex-col">
       <div class="bg-sky-800 text-white px-5 py-4 flex items-center justify-between">
@@ -286,6 +299,9 @@
     </div>
   </div>
 
+  <!-- Input ẩn để upload file Excel/CSV cho Danh mục sản phẩm -->
+  <input type="file" id="catalogExcelUploadInput" accept=".xlsx,.xls,.csv" class="hidden" onchange="handleCatalogExcelUpload(event)" />
+
   <!-- Toast Notification -->
   <div id="toast" class="hidden fixed bottom-5 right-5 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl text-xs font-semibold flex items-center gap-2 transition-all">
     <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
@@ -294,48 +310,175 @@
 
   <!-- ==================== JAVASCRIPT LOGIC ==================== -->
   <script>
-    // -------------------- 1. STATE & INITIAL DATA --------------------
-    const STORAGE_KEY = 'sohaco_workspace_v1';
+    // -------------------- 1. STATE, AUTH & INITIAL DATA --------------------
+    const STORAGE_KEY = 'sohaco_workspace_v3';
+    const DAV_LOOKUP_URL = 'https://dichvucong.dav.gov.vn/congbothuoc/index';
+    const PRODUCT_TYPES = ['Thuốc', 'Thực phẩm chức năng', 'Mỹ phẩm', 'Thiết bị y tế'];
+
+    // Định nghĩa cấu trúc 6 phân hệ theo thứ tự mới (dạng nếp gấp)
+    const MODULES_CONFIG = [
+      {
+        id: 'zalo-dossier',
+        title: 'Hồ sơ sản phẩm',
+        subtitle: 'Thuốc, Thực phẩm chức năng, Mỹ phẩm & Thiết bị y tế',
+        iconBg: 'from-sky-600 to-blue-700',
+        iconSvg: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 3h6m-5 0v3l-3.5 3.5A2 2 0 006 10.914V19a2 2 0 002 2h8a2 2 0 002-2v-8.086a2 2 0 00-.586-1.414L14 6V3"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9.5 14.5h5M12 12v5"/></svg>`
+      },
+      {
+        id: 'training-slides',
+        title: '2. Slide đào tạo',
+        subtitle: 'Sản phẩm, GDP, pháp chế,...',
+        iconBg: 'from-indigo-600 to-indigo-700',
+        iconSvg: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/></svg>`
+      },
+      {
+        id: 'product-catalog',
+        title: '3. Danh mục sản phẩm',
+        subtitle: 'Tra cứu thông tin về các sản phẩm đang kinh doanh',
+        iconBg: 'from-teal-600 to-emerald-700',
+        iconSvg: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>`
+      },
+      {
+        id: 'gdp-forms',
+        title: '4. GDP ngành Dược',
+        subtitle: 'SOP hiện hành, các biểu mẫu về GDP',
+        iconBg: 'from-emerald-600 to-green-700',
+        iconSvg: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>`
+      },
+      {
+        id: 'legal-pricing',
+        title: '5. Pháp lý & Kê khai giá Dược',
+        subtitle: 'Trích xuất hồ sơ pháp lý công ty & hồ sơ kê khai giá thuốc tại Việt Nam',
+        iconBg: 'from-rose-600 to-red-700',
+        iconSvg: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/></svg>`
+      },
+      {
+        id: 'feedback',
+        title: '6. Ý kiến đóng góp',
+        subtitle: 'Đóng góp của bạn có thể giúp công ty hoàn thiện chức năng hơn',
+        iconBg: 'from-amber-500 to-orange-600',
+        iconSvg: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>`
+      }
+    ];
 
     const DEFAULT_DATA = {
       logoDataUrl: '',
-      activeModule: 'zalo-dossier',
+      openModule: 'zalo-dossier', // Phân hệ đang mở nếp gấp
+      activeProductType: 'Thuốc',
+      activeCatalogGroup: 'ALL',
+      adminAuth: {
+        username: 'admin',
+        passwordHash: 'Sohaco@2026'
+      },
       googleSheetUrl: 'https://docs.google.com/spreadsheets/',
       googleAppsScriptUrl: '',
       zaloDossiers: [
         {
           id: 'zd1',
+          productType: 'Thuốc',
           productName: 'Sohaco-Cefixim 200mg',
           regNumber: 'VD-31245-24',
-          docType: 'Bộ hồ sơ đầy đủ (ĐK + COA + HDSD)',
-          fileUrl: 'https://drive.google.com/file/d/sample-cefixim/view',
-          updatedAt: '12/11/2026',
-          notes: 'Kháng sinh Cephalosporin thế hệ 3 - Hộp 2 vỉ x 10 viên'
+          regDate: '2029-12-31',
+          packaging: 'Hộp 2 vỉ x 10 viên nén bao phim',
+          driveContentDesc: 'Bộ hồ sơ Drive: Giấy ĐK lưu hành, COA lô mới nhất, Tờ HDSD',
+          driveUpdatedAt: '2026-11-16',
+          fileUrl: 'https://drive.google.com/drive/folders/sample-cefixim-200',
+          prescriptionType: 'Thuốc kê đơn',
+          essentialType: 'Thuốc thiết yếu'
         },
         {
           id: 'zd2',
+          productType: 'Thuốc',
           productName: 'Sohaco-Paracetamol 500mg Extra',
           regNumber: 'VD-29811-23',
-          docType: 'Tờ HDSD + Phiếu kiểm nghiệm (COA)',
-          fileUrl: 'https://drive.google.com/file/d/sample-para/view',
-          updatedAt: '08/11/2026',
-          notes: 'Giảm đau, hạ sốt - Dành cho kênh OTC & ETC'
+          regDate: '2028-08-20',
+          packaging: 'Hộp 10 vỉ x 10 viên nén',
+          driveContentDesc: 'Bộ hồ sơ Drive: Tờ HDSD, Phiếu kiểm nghiệm (COA), Công văn lưu hành',
+          driveUpdatedAt: '2026-11-12',
+          fileUrl: 'https://drive.google.com/drive/folders/sample-para-500',
+          prescriptionType: 'Thuốc không kê đơn',
+          essentialType: 'Thuốc thiết yếu'
         },
         {
           id: 'zd3',
+          productType: 'Thuốc',
+          productName: 'Sohaco-Alverin Citrat 40mg',
+          regNumber: 'VD-33018-25',
+          regDate: '2030-05-15',
+          packaging: 'Hộp 3 vỉ x 10 viên nang mềm',
+          driveContentDesc: 'Bộ hồ sơ Drive: Quyết định cấp SĐK, Nhãn & HDSD chuẩn',
+          driveUpdatedAt: '2026-11-05',
+          fileUrl: 'https://drive.google.com/drive/folders/sample-alverin',
+          prescriptionType: 'Thuốc kê đơn',
+          essentialType: 'Thuốc không thiết yếu'
+        },
+        {
+          id: 'zd4',
+          productType: 'Thực phẩm chức năng',
           productName: 'Sohaco-Liver Detox (Silymarin 140mg)',
           regNumber: '4512/2025/ĐKSP',
-          docType: 'Giấy tiếp nhận ĐKSP + Brochure Sale',
-          fileUrl: 'https://drive.google.com/file/d/sample-liver/view',
-          updatedAt: '02/11/2026',
-          notes: 'Thực phẩm bảo vệ sức khỏe hỗ trợ chức năng gan'
+          regDate: '',
+          packaging: 'Hộp 1 lọ x 60 viên nang mềm',
+          driveContentDesc: 'Bộ hồ sơ Drive: Giấy tiếp nhận ĐKSP, Xác nhận nội dung QC, Brochure',
+          driveUpdatedAt: '2026-11-14',
+          fileUrl: 'https://drive.google.com/drive/folders/sample-liver-detox',
+          priceDeclStatus: 'Kê khai giá',
+          ageGroup: 'Từ 6 tuổi trở lên'
+        },
+        {
+          id: 'zd4b',
+          productType: 'Thực phẩm chức năng',
+          productName: 'Sohaco Baby D3K2 Drops',
+          regNumber: '6208/2026/ĐKSP',
+          regDate: '',
+          packaging: 'Lọ nhỏ giọt 15ml',
+          driveContentDesc: 'Bộ hồ sơ Drive: Bản công bố ĐKSP, Tờ rơi hướng dẫn cho trẻ nhỏ',
+          driveUpdatedAt: '2026-11-15',
+          fileUrl: 'https://drive.google.com/drive/folders/sample-baby-d3k2',
+          priceDeclStatus: 'Không kê khai giá',
+          ageGroup: 'Từ 0 tuổi trở lên'
+        },
+        {
+          id: 'zd5',
+          productType: 'Mỹ phẩm',
+          productName: 'Sohaco Derma Care Gel 30g',
+          regNumber: '1842/25/CBMP-HN',
+          regDate: '2030-03-10',
+          packaging: 'Hộp 1 tuýp 30g',
+          driveContentDesc: 'Bộ hồ sơ Drive: Phiếu công bố sản phẩm mỹ phẩm, PIF tóm tắt',
+          driveUpdatedAt: '2026-11-10',
+          fileUrl: 'https://drive.google.com/drive/folders/sample-derma-care'
+        },
+        {
+          id: 'zd6',
+          productType: 'Thiết bị y tế',
+          productName: 'Dung dịch xịt mũi ưu trương Sohaco Saline',
+          regNumber: '2500112/PCBA-HN',
+          regDate: '2025-10-18',
+          packaging: 'Chai xịt phun sương 70ml',
+          driveContentDesc: 'Bộ hồ sơ Drive: Bản phân loại TTBYT loại A, Hồ sơ công bố tiêu chuẩn áp dụng',
+          driveUpdatedAt: '2026-11-15',
+          fileUrl: 'https://drive.google.com/drive/folders/sample-tbyt-saline',
+          deviceClass: 'Loại A'
+        },
+        {
+          id: 'zd7',
+          productType: 'Thiết bị y tế',
+          productName: 'Gel bôi trơn & hỗ trợ nội soi Sohaco MedGel',
+          regNumber: '2500459/PCBB-BYT',
+          regDate: '2026-02-22',
+          packaging: 'Tuýp vô khuẩn 82g',
+          driveContentDesc: 'Bộ hồ sơ Drive: Giấy chứng nhận lưu hành TTBYT Loại B, CFS & ISO 13485',
+          driveUpdatedAt: '2026-11-11',
+          fileUrl: 'https://drive.google.com/drive/folders/sample-tbyt-medgel',
+          deviceClass: 'Loại B'
         }
       ],
       trainingSlides: [
         {
           id: 'sl1',
           title: 'Đào tạo sản phẩm mới Q4/2026: Nhóm Kháng sinh & Hô hấp',
-          category: 'Sản phẩm mới',
+          category: 'Sản phẩm',
           author: 'Phòng Marketing & Y khoa Sohaco',
           format: 'Google Slides / PPTX',
           slideUrl: 'https://docs.google.com/presentation/',
@@ -344,80 +487,100 @@
         },
         {
           id: 'sl2',
-          title: 'Kỹ năng tư vấn bán hàng Dược phẩm kênh Nhà thuốc (OTC)',
-          category: 'Kỹ năng Sale',
-          author: 'Trung tâm Đào tạo Sohaco',
-          format: 'PDF / Slide',
-          slideUrl: 'https://docs.google.com/presentation/',
-          updatedAt: '25/10/2026',
-          summary: 'Quy trình 5 bước tiếp cận chủ nhà thuốc và chốt đơn hàng đầu.'
-        },
-        {
-          id: 'sl3',
           title: 'Hướng dẫn thực hành GDP cho Trình dược viên & Giao nhận',
-          category: 'Quy trình GDP',
+          category: 'GDP',
           author: 'Phòng QA/QC Sohaco',
           format: 'PPTX',
           slideUrl: 'https://docs.google.com/presentation/',
           updatedAt: '15/10/2026',
           summary: 'Kiểm soát điều kiện bảo quản thuốc khi vận chuyển và tiếp nhận khiếu nại.'
+        },
+        {
+          id: 'sl3',
+          title: 'Cập nhật Pháp chế Dược: Quy định Kê khai giá & Công bố thuốc 2026',
+          category: 'Pháp chế',
+          author: 'Phòng Pháp chế Sohaco',
+          format: 'PDF / Slide',
+          slideUrl: 'https://docs.google.com/presentation/',
+          updatedAt: '02/11/2026',
+          summary: 'Điểm mới Luật Dược sửa đổi và quy trình tra cứu hồ sơ Cục Quản lý Dược.'
         }
       ],
       products: [
         {
           id: 'p1',
+          groupCode: '1.1',
+          groupName: 'Thuốc - Kháng sinh',
           code: 'SHC-KS01',
           name: 'Sohaco-Cefixim 200mg',
           ingredient: 'Cefixim 200mg',
-          group: 'Kháng sinh',
+          atcCode: 'J01DD08',
+          atcClass: 'Kháng khuẩn dùng toàn thân - Cephalosporin thế hệ 3 (WHO)',
+          regNumber: 'VD-31245-24',
           packaging: 'Hộp 2 vỉ x 10 viên nén bao phim',
           manufacturer: 'Nhà máy Sohaco / GMP-WHO',
-          priceInfo: 'Liên hệ Sale / Theo bảng kê khai',
+          davUrl: DAV_LOOKUP_URL,
+          priceInfo: 'Kênh ETC & OTC • Theo bảng kê khai',
           status: 'Đang kinh doanh',
-          docUrl: 'https://drive.google.com/file/d/sample-cefixim/view'
+          docUrl: 'https://drive.google.com/drive/folders/sample-cefixim-200'
         },
         {
           id: 'p2',
+          groupCode: '1.2',
+          groupName: 'Thuốc - Giảm đau, hạ sốt',
           code: 'SHC-GD02',
           name: 'Sohaco-Paracetamol 500mg Extra',
           ingredient: 'Paracetamol 500mg + Cafein 65mg',
-          group: 'Giảm đau - Hạ sốt',
+          atcCode: 'N02BE51',
+          atcClass: 'Thuốc giảm đau, hạ sốt nhóm Anilid (phối hợp) - Hệ thần kinh (WHO)',
+          regNumber: 'VD-29811-23',
           packaging: 'Hộp 10 vỉ x 10 viên',
           manufacturer: 'Nhà máy Sohaco / GMP-WHO',
-          priceInfo: 'Kênh OTC & Bệnh viện',
+          davUrl: DAV_LOOKUP_URL,
+          priceInfo: 'Kênh OTC & Nhà thuốc',
           status: 'Đang kinh doanh',
-          docUrl: 'https://drive.google.com/file/d/sample-para/view'
+          docUrl: 'https://drive.google.com/drive/folders/sample-para-500'
         },
         {
           id: 'p3',
+          groupCode: '1.3',
+          groupName: 'Thuốc - Tiêu hóa',
           code: 'SHC-TH05',
           name: 'Sohaco-Omeprazol 20mg',
           ingredient: 'Omeprazol 20mg',
-          group: 'Tiêu hóa',
+          atcCode: 'A02BC01',
+          atcClass: 'Thuốc ức chế bơm Proton - Hệ tiêu hóa & Chuyển hóa (WHO)',
+          regNumber: 'VD-30119-24',
           packaging: 'Hộp 3 vỉ x 10 viên nang kháng dịch dạ dày',
           manufacturer: 'Nhà máy Sohaco / GMP-WHO',
+          davUrl: DAV_LOOKUP_URL,
           priceInfo: 'Đã kê khai giá Cục QLD',
           status: 'Đang kinh doanh',
-          docUrl: 'https://drive.google.com/file/d/sample-omeprazol/view'
+          docUrl: 'https://drive.google.com/drive/folders/sample-omeprazol'
         },
         {
           id: 'p4',
+          groupCode: '2.1',
+          groupName: 'Thực phẩm bảo vệ sức khỏe - Gan mật',
           code: 'SHC-TP08',
           name: 'Sohaco-Liver Detox',
           ingredient: 'Silymarin 140mg + Vitamin nhóm B',
-          group: 'Thực phẩm BVSK',
+          atcCode: 'A05BA03',
+          atcClass: 'Nhóm điều trị gan mật (Silymarin - Tham chiếu WHO ATC)',
+          regNumber: '4512/2025/ĐKSP',
           packaging: 'Hộp 60 viên nang mềm',
           manufacturer: 'Nhà máy đạt chuẩn GMP',
+          davUrl: DAV_LOOKUP_URL,
           priceInfo: 'Chương trình khuyến mãi Q4',
           status: 'Sản phẩm chủ lực',
-          docUrl: 'https://drive.google.com/file/d/sample-liver/view'
+          docUrl: 'https://drive.google.com/drive/folders/sample-liver-detox'
         }
       ],
       gdpForms: [
         {
           id: 'gdp1',
           code: 'SOP-GDP-01',
-          title: 'Phiếu theo dõi nhiệt độ & độ ẩm kho bảo quản thuốc hàng ngày',
+          title: 'SOP kiểm soát nhiệt độ & độ ẩm kho bảo quản thuốc hàng ngày',
           version: 'Phiên bản 4.0',
           effectiveDate: '01/10/2026',
           department: 'Kho vận & QA',
@@ -440,16 +603,6 @@
           effectiveDate: '20/08/2026',
           department: 'QA/QC',
           fileUrl: 'https://docs.google.com/document/'
-        }
-      ],
-      feedbacks: [
-        {
-          id: 'fb1',
-          sender: 'Nguyễn Văn Minh (Sale Miền Bắc)',
-          department: 'Kinh doanh ETC',
-          topic: 'Hồ sơ sản phẩm',
-          content: 'Đề xuất bổ sung thêm file COA lô mới nhất của Cefixim 200mg để gửi bệnh viện nhanh hơn.',
-          createdAt: '14/11/2026 09:30'
         }
       ],
       legalPricing: [
@@ -482,16 +635,16 @@
           declaredPrice: 'Bản sao công chứng PDF',
           effectiveDate: '10/05/2024',
           fileUrl: 'https://drive.google.com/file/d/sample-ddkkdd/view'
-        },
+        }
+      ],
+      feedbacks: [
         {
-          id: 'lp4',
-          code: 'KKG-2026-102',
-          title: 'Bảng tổng hợp giá kê khai / kê khai lại nhóm thuốc Tiêu hóa & Giảm đau 2026',
-          category: 'Kê khai giá thuốc',
-          authority: 'Cục Quản lý Dược - Bộ Y tế',
-          declaredPrice: 'Theo danh mục đính kèm',
-          effectiveDate: '05/11/2026',
-          fileUrl: 'https://drive.google.com/file/d/sample-kkg-list/view'
+          id: 'fb1',
+          sender: 'Nguyễn Văn Minh (Sale Miền Bắc)',
+          department: 'Kinh doanh ETC',
+          topic: 'Hồ sơ sản phẩm',
+          content: 'Đề xuất bổ sung thêm file COA lô mới nhất của Cefixim 200mg trên link Drive.',
+          createdAt: '14/11/2026 09:30'
         }
       ]
     };
@@ -500,12 +653,18 @@
     let isAdminMode = false;
     let selectedZaloIds = new Set();
     let selectedLegalIds = new Set();
+    let activeHighlightId = null;
 
     function loadState() {
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
         if (!raw) return structuredClone(DEFAULT_DATA);
-        return { ...structuredClone(DEFAULT_DATA), ...JSON.parse(raw) };
+        const parsed = JSON.parse(raw);
+        return {
+          ...structuredClone(DEFAULT_DATA),
+          ...parsed,
+          adminAuth: { ...DEFAULT_DATA.adminAuth, ...(parsed.adminAuth || {}) }
+        };
       } catch (e) {
         return structuredClone(DEFAULT_DATA);
       }
@@ -520,7 +679,105 @@
       return JSON.parse(JSON.stringify(obj));
     }
 
-    // -------------------- 2. NON-CONTIGUOUS VIETNAMESE FUZZY SEARCH --------------------
+    // -------------------- 2. DATE HELPERS (DD/MM/YYYY <-> YYYY-MM-DD) --------------------
+    function formatDateDDMMYYYY(val) {
+      if (!val) return '';
+      const s = String(val).trim();
+      if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+        const [y, m, d] = s.split('-');
+        return `${d}/${m}/${y}`;
+      }
+      return s;
+    }
+
+    function toInputDateYYYYMMDD(val) {
+      if (!val) return '';
+      const s = String(val).trim();
+      if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+      const m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+      if (m) {
+        return `${m[3]}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}`;
+      }
+      return '';
+    }
+
+    // -------------------- 3. ADMIN LOGIN / AUTH (NO AUTO-FILL) --------------------
+    function handleAdminAuthClick() {
+      if (isAdminMode) {
+        if (confirm('Bạn muốn đăng xuất khỏi quyền Quản trị (Admin)?')) {
+          isAdminMode = false;
+          updateAdminUI();
+          renderAccordionWorkspace();
+          showToast('Đã đăng xuất quyền Admin');
+        }
+        return;
+      }
+      document.getElementById('loginUsername').value = '';
+      document.getElementById('loginPassword').value = '';
+      document.getElementById('loginErrorMsg').classList.add('hidden');
+      document.getElementById('adminLoginModal').classList.remove('hidden');
+      setTimeout(() => document.getElementById('loginUsername').focus(), 50);
+    }
+
+    function submitAdminLogin(e) {
+      e.preventDefault();
+      const user = document.getElementById('loginUsername').value.trim();
+      const pass = document.getElementById('loginPassword').value;
+      const errEl = document.getElementById('loginErrorMsg');
+
+      if (user === appState.adminAuth.username && pass === appState.adminAuth.passwordHash) {
+        isAdminMode = true;
+        errEl.classList.add('hidden');
+        closeModal('adminLoginModal');
+        updateAdminUI();
+        renderAccordionWorkspace();
+        showToast('Đăng nhập quyền Quản trị (Admin) thành công!');
+      } else {
+        errEl.classList.remove('hidden');
+        document.getElementById('loginPassword').value = '';
+      }
+    }
+
+    function openChangePasswordModal() {
+      document.getElementById('oldAdminPass').value = '';
+      document.getElementById('newAdminPass').value = '';
+      document.getElementById('changePasswordModal').classList.remove('hidden');
+    }
+
+    function submitChangePassword(e) {
+      e.preventDefault();
+      const oldP = document.getElementById('oldAdminPass').value;
+      const newP = document.getElementById('newAdminPass').value;
+      if (oldP !== appState.adminAuth.passwordHash) {
+        alert('Mật khẩu hiện tại không chính xác!');
+        return;
+      }
+      appState.adminAuth.passwordHash = newP;
+      saveState();
+      closeModal('changePasswordModal');
+      showToast('Đã đổi mật khẩu Admin thành công!');
+    }
+
+    function updateAdminUI() {
+      const dot = document.getElementById('modeIndicatorDot');
+      const txt = document.getElementById('modeIndicatorText');
+      const mobileBtn = document.getElementById('adminToggleBtnMobile');
+      const banner = document.getElementById('adminBannerBadge');
+
+      if (isAdminMode) {
+        dot.className = 'w-2 h-2 rounded-full bg-amber-500';
+        txt.textContent = 'Admin (Đăng xuất)';
+        mobileBtn.textContent = 'Admin (Đăng xuất)';
+        banner.classList.remove('hidden');
+      } else {
+        dot.className = 'w-2 h-2 rounded-full bg-emerald-500';
+        txt.textContent = 'Chế độ: Nhân viên (Đăng nhập Admin)';
+        mobileBtn.textContent = 'Đăng nhập Admin';
+        banner.classList.add('hidden');
+      }
+    }
+
+    // -------------------- 4. NON-CONTIGUOUS VIETNAMESE FUZZY SEARCH --------------------
     function removeVietnameseTones(str) {
       return (str || '')
         .toLowerCase()
@@ -529,32 +786,19 @@
         .replace(/đ/g, 'd');
     }
 
-    /**
-     * Thuật toán tìm kiếm ký tự không cần liền mạch:
-     * - Ưu tiên 1: Khớp cụm từ liền mạch (Score 100)
-     * - Ưu tiên 2: Các ký tự xuất hiện đúng thứ tự nhưng không cần liền mạch (Subsequence - Score 75)
-     * - Ưu tiên 3: Chứa toàn bộ các ký tự người dùng gõ dù ở bất kỳ vị trí/thứ tự nào (Score 45)
-     */
     function matchNonContiguous(queryRaw, targetText) {
       const qClean = removeVietnameseTones(queryRaw).replace(/\s+/g, '');
       if (!qClean) return null;
 
       const tNorm = removeVietnameseTones(targetText);
-      const tOrig = targetText || '';
-
-      // Map normalized char index back to original string index (1:1 for NFD stripped standard chars)
-      // Check contiguous substring first
       const qSpaced = removeVietnameseTones(queryRaw).trim();
       const contiguousIdx = tNorm.indexOf(qSpaced);
       if (contiguousIdx !== -1) {
         const matchedIndices = new Set();
-        for (let i = contiguousIdx; i < contiguousIdx + qSpaced.length; i++) {
-          matchedIndices.add(i);
-        }
+        for (let i = contiguousIdx; i < contiguousIdx + qSpaced.length; i++) matchedIndices.add(i);
         return { score: 100, indices: matchedIndices };
       }
 
-      // Check ordered subsequence (non-contiguous)
       let qi = 0;
       const subseqIndices = new Set();
       for (let ti = 0; ti < tNorm.length && qi < qClean.length; ti++) {
@@ -563,30 +807,21 @@
           qi++;
         }
       }
-      if (qi === qClean.length) {
-        return { score: 75, indices: subseqIndices };
-      }
+      if (qi === qClean.length) return { score: 75, indices: subseqIndices };
 
-      // Check unordered character inclusion (tất cả ký tự gõ vào đều có mặt trong chuỗi đích)
       const usedIndices = new Set();
       let foundCount = 0;
       for (let i = 0; i < qClean.length; i++) {
         const ch = qClean[i];
-        let found = false;
         for (let j = 0; j < tNorm.length; j++) {
           if (!usedIndices.has(j) && tNorm[j] === ch) {
             usedIndices.add(j);
-            found = true;
+            foundCount++;
             break;
           }
         }
-        if (found) foundCount++;
       }
-
-      if (foundCount === qClean.length) {
-        return { score: 45, indices: usedIndices };
-      }
-
+      if (foundCount === qClean.length) return { score: 45, indices: usedIndices };
       return null;
     }
 
@@ -595,11 +830,7 @@
       let result = '';
       for (let i = 0; i < text.length; i++) {
         const ch = escapeHtml(text[i]);
-        if (indicesSet.has(i)) {
-          result += `<mark class="search-highlight">${ch}</mark>`;
-        } else {
-          result += ch;
-        }
+        result += indicesSet.has(i) ? `<mark class="search-highlight">${ch}</mark>` : ch;
       }
       return result;
     }
@@ -607,8 +838,8 @@
     function buildSearchIndex() {
       const items = [];
       appState.zaloDossiers.forEach(d => items.push({
-        module: 'zalo-dossier', moduleLabel: '1. Hồ sơ & Zalo', badgeColor: 'bg-blue-100 text-blue-700',
-        id: d.id, title: d.productName, subtitle: `${d.regNumber} • ${d.docType} • ${d.notes}`
+        module: 'zalo-dossier', subType: d.productType, moduleLabel: `Hồ sơ SP • ${d.productType}`, badgeColor: 'bg-blue-100 text-blue-700',
+        id: d.id, title: d.productName, subtitle: `${d.regNumber} • ${d.packaging} • ${d.driveContentDesc || ''}`
       }));
       appState.trainingSlides.forEach(s => items.push({
         module: 'training-slides', moduleLabel: '2. Slide đào tạo', badgeColor: 'bg-indigo-100 text-indigo-700',
@@ -616,14 +847,14 @@
       }));
       appState.products.forEach(p => items.push({
         module: 'product-catalog', moduleLabel: '3. Danh mục SP', badgeColor: 'bg-teal-100 text-teal-700',
-        id: p.id, title: `${p.name} (${p.code})`, subtitle: `${p.ingredient} • ${p.group} • ${p.packaging}`
+        id: p.id, title: `${p.name} (${p.code})`, subtitle: `${p.groupCode || ''} ${p.groupName || ''} • ${p.ingredient} • ATC: ${p.atcCode || ''}`
       }));
       appState.gdpForms.forEach(g => items.push({
-        module: 'gdp-forms', moduleLabel: '4. Biểu mẫu GDP', badgeColor: 'bg-emerald-100 text-emerald-700',
+        module: 'gdp-forms', moduleLabel: '4. GDP ngành Dược', badgeColor: 'bg-emerald-100 text-emerald-700',
         id: g.id, title: `${g.code}: ${g.title}`, subtitle: `${g.version} • ${g.department} • Hiệu lực: ${g.effectiveDate}`
       }));
       appState.legalPricing.forEach(l => items.push({
-        module: 'legal-pricing', moduleLabel: '6. Pháp lý & Kê khai giá', badgeColor: 'bg-rose-100 text-rose-700',
+        module: 'legal-pricing', moduleLabel: '5. Pháp lý & Kê khai giá', badgeColor: 'bg-rose-100 text-rose-700',
         id: l.id, title: `${l.code}: ${l.title}`, subtitle: `${l.category} • ${l.authority} • ${l.declaredPrice}`
       }));
       return items;
@@ -676,7 +907,7 @@
         listEl.innerHTML = `<div class="p-6 text-center text-sm text-slate-500">Không tìm thấy nội dung nào chứa đầy đủ các ký tự "<strong>${escapeHtml(query)}</strong>".</div>`;
       } else {
         listEl.innerHTML = matches.slice(0, 15).map(m => `
-          <button onclick="jumpToSearchResult('${m.module}', '${m.id}')" class="w-full text-left px-4 py-3 hover:bg-sky-50 transition flex items-start justify-between gap-3">
+          <button onclick="jumpToSearchResult('${m.module}', '${m.id}', '${escapeHtml(m.subType || '')}')" class="w-full text-left px-4 py-3 hover:bg-sky-50 transition flex items-start justify-between gap-3">
             <div class="min-w-0">
               <div class="text-sm font-semibold text-slate-900 truncate">${m.titleHtml}</div>
               <div class="text-xs text-slate-500 mt-0.5 line-clamp-1">${m.subHtml}</div>
@@ -690,8 +921,7 @@
     }
 
     function triggerSearchButton() {
-      const input = document.getElementById('globalSearchInput');
-      input.focus();
+      document.getElementById('globalSearchInput').focus();
       handleGlobalSearch();
     }
 
@@ -701,12 +931,28 @@
       document.getElementById('clearSearchBtn').classList.add('hidden');
     }
 
-    function jumpToSearchResult(moduleName, itemId) {
+    function jumpToSearchResult(moduleName, itemId, subType = '') {
       document.getElementById('searchResultsDropdown').classList.add('hidden');
-      switchModule(moduleName, itemId);
+      if (moduleName === 'zalo-dossier' && subType) {
+        appState.activeProductType = subType;
+      }
+      if (moduleName === 'product-catalog') {
+        appState.activeCatalogGroup = 'ALL';
+      }
+      appState.openModule = moduleName;
+      activeHighlightId = itemId;
+      saveState();
+      renderAccordionWorkspace();
+
+      // Tự động cuộn mượt tới đúng nếp gấp phân hệ & dòng được tìm thấy
+      setTimeout(() => {
+        const targetRow = document.getElementById(`item-${itemId}`) || document.getElementById(`accordion-${moduleName}`);
+        if (targetRow) {
+          targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
     }
 
-    // Close search dropdown when clicking outside
     document.addEventListener('click', (e) => {
       const wrapper = document.getElementById('searchWrapper');
       if (wrapper && !wrapper.contains(e.target)) {
@@ -714,7 +960,7 @@
       }
     });
 
-    // -------------------- 3. LOGO UPLOAD & ADMIN MODE --------------------
+    // -------------------- 5. LOGO UPLOAD --------------------
     function handleLogoUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -731,125 +977,239 @@
     function renderLogo() {
       const img = document.getElementById('companyLogoImg');
       const fallback = document.getElementById('companyLogoFallback');
+      const modalImg = document.getElementById('modalLogoImg');
+      const modalFallback = document.getElementById('modalLogoFallback');
+
       if (appState.logoDataUrl) {
         img.src = appState.logoDataUrl;
         img.classList.remove('hidden');
         fallback.classList.add('hidden');
+        if (modalImg) {
+          modalImg.src = appState.logoDataUrl;
+          modalImg.classList.remove('hidden');
+          modalFallback.classList.add('hidden');
+        }
       } else {
         img.classList.add('hidden');
         fallback.classList.remove('hidden');
-      }
-    }
-
-    function toggleAdminMode() {
-      if (!isAdminMode) {
-        const pwd = prompt('Nhập mật khẩu Quản trị viên (mặc định: sohaco2026):', 'sohaco2026');
-        if (pwd === null) return;
-        if (pwd.trim() !== 'sohaco2026') {
-          alert('Mật khẩu chưa chính xác!');
-          return;
+        if (modalImg) {
+          modalImg.classList.add('hidden');
+          modalFallback.classList.remove('hidden');
         }
-        isAdminMode = true;
-        showToast('Đã bật Chế độ Quản trị (Admin)');
-      } else {
-        isAdminMode = false;
-        showToast('Đã chuyển về Chế độ Nhân viên');
-      }
-      updateAdminUI();
-      renderActiveModule();
-    }
-
-    function updateAdminUI() {
-      const dot = document.getElementById('modeIndicatorDot');
-      const txt = document.getElementById('modeIndicatorText');
-      const mobileBtn = document.getElementById('adminToggleBtnMobile');
-      const banner = document.getElementById('adminBannerBadge');
-
-      if (isAdminMode) {
-        dot.className = 'w-2 h-2 rounded-full bg-amber-500';
-        txt.textContent = 'Chế độ: Quản trị (Admin)';
-        mobileBtn.textContent = 'Chế độ: Admin';
-        banner.classList.remove('hidden');
-      } else {
-        dot.className = 'w-2 h-2 rounded-full bg-emerald-500';
-        txt.textContent = 'Chế độ: Nhân viên';
-        mobileBtn.textContent = 'Chế độ: Nhân viên';
-        banner.classList.add('hidden');
       }
     }
 
-    // -------------------- 4. MODULE SWITCHER & RENDERING --------------------
-    function switchModule(moduleName, highlightId = null) {
-      appState.activeModule = moduleName;
+    // -------------------- 6. ACCORDION RENDERING (DẠNG NẾP GẤP) --------------------
+    function getModuleCountLabel(moduleId) {
+      switch (moduleId) {
+        case 'zalo-dossier': return `${appState.zaloDossiers.length} hồ sơ`;
+        case 'training-slides': return `${appState.trainingSlides.length} slide`;
+        case 'product-catalog': return `${appState.products.length} sản phẩm`;
+        case 'gdp-forms': return `${appState.gdpForms.length} biểu mẫu`;
+        case 'legal-pricing': return `${appState.legalPricing.length} văn bản`;
+        case 'feedback': return `${appState.feedbacks.length} góp ý`;
+        default: return '';
+      }
+    }
+
+    function toggleAccordionModule(moduleId) {
+      activeHighlightId = null;
+      if (appState.openModule === moduleId) {
+        appState.openModule = ''; // Cho phép gấp lại nếu bấm lại vào phân hệ đang mở
+      } else {
+        appState.openModule = moduleId;
+      }
       saveState();
+      renderAccordionWorkspace();
 
-      document.querySelectorAll('.module-btn').forEach(btn => btn.classList.remove('module-btn-active'));
-      const activeBtn = document.getElementById(`btn-${moduleName}`);
-      if (activeBtn) activeBtn.classList.add('module-btn-active');
-
-      renderActiveModule(highlightId);
+      if (appState.openModule) {
+        setTimeout(() => {
+          const panel = document.getElementById(`accordion-${moduleId}`);
+          if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 60);
+      }
     }
 
-    function renderActiveModule(highlightId = null) {
-      const container = document.getElementById('workspaceContainer');
-      switch (appState.activeModule) {
-        case 'zalo-dossier': renderZaloDossier(container, highlightId); break;
+    function renderAccordionWorkspace() {
+      const wrapper = document.getElementById('accordionWorkspace');
+      wrapper.innerHTML = MODULES_CONFIG.map(mod => {
+        const isOpen = appState.openModule === mod.id;
+        return `
+          <div id="accordion-${mod.id}" class="bg-white rounded-2xl border-2 ${isOpen ? 'accordion-card-open' : 'border-slate-200 hover:border-sky-300'} transition-all overflow-hidden">
+            <!-- Thanh tiêu đề nếp gấp -->
+            <button onclick="toggleAccordionModule('${mod.id}')" class="w-full text-left p-4 sm:px-5 sm:py-4 flex items-center justify-between gap-4 transition ${isOpen ? 'accordion-header-open border-b border-slate-200' : 'hover:bg-slate-50'}">
+              <div class="flex items-center gap-3.5 min-w-0">
+                <div class="w-11 h-11 rounded-xl bg-gradient-to-br ${mod.iconBg} text-white flex items-center justify-center shrink-0 shadow-sm">
+                  ${mod.iconSvg}
+                </div>
+                <div class="min-w-0">
+                  <div class="flex flex-wrap items-center gap-2">
+                    <span class="font-extrabold text-slate-900 text-sm sm:text-base">${escapeHtml(mod.title)}</span>
+                    <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full ${isOpen ? 'bg-sky-100 text-sky-800' : 'bg-slate-100 text-slate-600'}">${getModuleCountLabel(mod.id)}</span>
+                  </div>
+                  <p class="text-xs text-slate-500 mt-0.5 truncate sm:whitespace-normal">${escapeHtml(mod.subtitle)}</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 shrink-0">
+                <span class="hidden sm:inline text-xs font-semibold ${isOpen ? 'text-sky-700' : 'text-slate-400'}">${isOpen ? 'Thu gọn' : 'Mở xem'}</span>
+                <div class="w-8 h-8 rounded-full flex items-center justify-center ${isOpen ? 'bg-sky-100 text-sky-700 rotate-180' : 'bg-slate-100 text-slate-500'} transition-transform duration-200">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                </div>
+              </div>
+            </button>
+
+            <!-- Nội dung bên trong nếp gấp (chỉ bung ra khi được chọn) -->
+            ${isOpen ? `<div id="panel-body-${mod.id}" class="p-4 sm:p-6 bg-white"></div>` : ''}
+          </div>
+        `;
+      }).join('');
+
+      if (appState.openModule) {
+        const bodyEl = document.getElementById(`panel-body-${appState.openModule}`);
+        if (bodyEl) renderModuleBody(appState.openModule, bodyEl, activeHighlightId);
+      }
+    }
+
+    function renderModuleBody(moduleId, container, highlightId) {
+      switch (moduleId) {
+        case 'zalo-dossier': renderProductDossiers(container, highlightId); break;
         case 'training-slides': renderTrainingSlides(container, highlightId); break;
         case 'product-catalog': renderProductCatalog(container, highlightId); break;
         case 'gdp-forms': renderGdpForms(container, highlightId); break;
-        case 'feedback': renderFeedbackModule(container); break;
         case 'legal-pricing': renderLegalPricing(container, highlightId); break;
-        default: renderZaloDossier(container, highlightId);
+        case 'feedback': renderFeedbackModule(container); break;
       }
     }
 
-    // --- MODULE 1: TRÍCH XUẤT HỒ SƠ SẢN PHẨM & GỬI ZALO ---
-    function renderZaloDossier(container, highlightId) {
+    // --- MODULE 1: HỒ SƠ SẢN PHẨM ---
+    function selectProductTypeTab(pType) {
+      appState.activeProductType = pType;
+      activeHighlightId = null;
+      saveState();
+      renderAccordionWorkspace();
+    }
+
+    function renderDossierRegDateLine(item) {
+      if (item.productType === 'Thuốc' || item.productType === 'Mỹ phẩm') {
+        const dStr = formatDateDDMMYYYY(item.regDate);
+        return dStr ? `<div class="text-[11px] text-slate-600 mt-1">Ngày hết hạn: <strong class="text-slate-800">${escapeHtml(dStr)}</strong></div>` : '';
+      }
+      if (item.productType === 'Thiết bị y tế') {
+        const dStr = formatDateDDMMYYYY(item.regDate);
+        return dStr ? `<div class="text-[11px] text-slate-600 mt-1">Ngày tiếp nhận: <strong class="text-slate-800">${escapeHtml(dStr)}</strong></div>` : '';
+      }
+      // Thực phẩm chức năng: Không hiển thị mục ngày này
+      return '';
+    }
+
+    function renderDossierClassificationCell(item) {
+      if (item.productType === 'Mỹ phẩm') {
+        // Cột phân loại của Mỹ phẩm để trống
+        return '';
+      }
+      if (item.productType === 'Thuốc') {
+        return `
+          <div class="flex flex-col gap-1 items-start">
+            ${item.prescriptionType ? `<span class="text-[11px] font-semibold px-2 py-0.5 rounded-full ${item.prescriptionType.includes('không') ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-800 border border-amber-200'}">${escapeHtml(item.prescriptionType)}</span>` : ''}
+            ${item.essentialType ? `<span class="text-[11px] font-semibold px-2 py-0.5 rounded-full ${item.essentialType.includes('không') ? 'bg-slate-100 text-slate-600 border border-slate-200' : 'bg-indigo-50 text-indigo-700 border border-indigo-200'}">${escapeHtml(item.essentialType)}</span>` : ''}
+          </div>
+        `;
+      }
+      if (item.productType === 'Thực phẩm chức năng') {
+        return `
+          <div class="flex flex-col gap-1 items-start">
+            ${item.priceDeclStatus ? `<span class="text-[11px] font-semibold px-2 py-0.5 rounded-full ${item.priceDeclStatus.includes('Không') ? 'bg-slate-100 text-slate-700 border border-slate-200' : 'bg-rose-50 text-rose-700 border border-rose-200'}">${escapeHtml(item.priceDeclStatus)}</span>` : ''}
+            ${item.ageGroup ? `<span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-teal-50 text-teal-800 border border-teal-200">${escapeHtml(item.ageGroup)}</span>` : ''}
+          </div>
+        `;
+      }
+      if (item.productType === 'Thiết bị y tế') {
+        const clsColor = {
+          'Loại A': 'bg-emerald-50 text-emerald-800 border-emerald-200',
+          'Loại B': 'bg-sky-50 text-sky-800 border-sky-200',
+          'Loại C': 'bg-amber-50 text-amber-800 border-amber-200',
+          'Loại D': 'bg-rose-50 text-rose-800 border-rose-200'
+        }[item.deviceClass] || 'bg-slate-100 text-slate-700 border-slate-200';
+        return item.deviceClass ? `<span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full border ${clsColor}">${escapeHtml(item.deviceClass)}</span>` : '';
+      }
+      return '';
+    }
+
+    function renderProductDossiers(container, highlightId) {
+      const currentType = appState.activeProductType || 'Thuốc';
+      const filteredList = appState.zaloDossiers.filter(item => item.productType === currentType);
+      const allFilteredSelected = filteredList.length > 0 && filteredList.every(item => selectedZaloIds.has(item.id));
+
       container.innerHTML = `
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-200">
-          <div>
-            <h3 class="text-lg font-extrabold text-slate-900">1. Trích xuất hồ sơ sản phẩm gửi qua Zalo</h3>
-            <p class="text-xs text-slate-500 mt-0.5">Tích chọn một hoặc nhiều hồ sơ sản phẩm bên dưới để đóng gói nội dung gửi khách hàng qua Zalo.</p>
+          <div class="flex flex-wrap gap-2">
+            ${PRODUCT_TYPES.map(pt => {
+              const count = appState.zaloDossiers.filter(x => x.productType === pt).length;
+              const active = pt === currentType;
+              return `
+                <button onclick="selectProductTypeTab('${pt}')" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold border transition-all flex items-center gap-2 ${active ? 'bg-sky-700 text-white border-sky-700 shadow-sm' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-sky-50 hover:border-sky-300'}">
+                  <span>${pt}</span>
+                  <span class="text-[11px] px-2 py-0.5 rounded-full ${active ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-600'}">${count}</span>
+                </button>
+              `;
+            }).join('')}
           </div>
           <div class="flex flex-wrap items-center gap-2">
-            <button onclick="extractSelectedToZalo('zalo')" class="px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white shadow flex items-center gap-1.5">
-              <span>Trích xuất & Gửi Zalo (${selectedZaloIds.size})</span>
+            <button onclick="sendSelectedDossiers()" class="px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white shadow flex items-center gap-1.5">
+              <span>Gửi các mục đã chọn (${selectedZaloIds.size})</span>
             </button>
             ${isAdminMode ? `<button onclick="openAdminModal('zalo-dossier')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-sky-700 hover:bg-sky-800 text-white">+ Thêm hồ sơ SP</button>` : ''}
           </div>
         </div>
 
-        <div class="mt-4 overflow-x-auto">
+        <div class="mt-4 overflow-x-auto rounded-xl border border-slate-200">
           <table class="w-full text-left border-collapse">
             <thead>
               <tr class="bg-slate-50 text-slate-600 text-xs uppercase border-b border-slate-200">
-                <th class="p-3 w-10 text-center">Chọn</th>
-                <th class="p-3">Sản phẩm & Số ĐK</th>
-                <th class="p-3">Loại hồ sơ đính kèm</th>
-                <th class="p-3">Ghi chú cho Sale</th>
+                <th class="p-3 w-10 text-center">
+                  <input type="checkbox" ${allFilteredSelected ? 'checked' : ''} onchange="toggleSelectAllZalo('${currentType}', this.checked)" class="w-4 h-4 accent-blue-600 cursor-pointer" title="Chọn tất cả" />
+                </th>
+                <th class="p-3">Tên sản phẩm</th>
+                <th class="p-3">Số lưu hành</th>
+                <th class="p-3">Quy cách sản phẩm</th>
+                <th class="p-3">Hồ sơ đính kèm (Google Drive)</th>
+                <th class="p-3">Phân loại</th>
                 <th class="p-3 text-right">Thao tác</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100 text-sm">
-              ${appState.zaloDossiers.map(item => `
-                <tr class="${highlightId === item.id ? 'bg-yellow-50' : 'hover:bg-slate-50'} transition">
+              ${filteredList.length === 0 ? `
+                <tr><td colspan="7" class="p-8 text-center text-sm text-slate-400">Chưa có hồ sơ nào trong nhóm <strong>${escapeHtml(currentType)}</strong>.</td></tr>
+              ` : filteredList.map(item => `
+                <tr id="item-${item.id}" class="${highlightId === item.id ? 'bg-yellow-50 ring-2 ring-amber-300' : 'hover:bg-slate-50/80'} transition">
                   <td class="p-3 text-center">
                     <input type="checkbox" ${selectedZaloIds.has(item.id) ? 'checked' : ''} onchange="toggleSelection('zalo', '${item.id}')" class="w-4 h-4 accent-blue-600 cursor-pointer" />
                   </td>
                   <td class="p-3">
                     <div class="font-bold text-slate-900">${escapeHtml(item.productName)}</div>
-                    <div class="text-xs text-sky-700 font-semibold">Số ĐK: ${escapeHtml(item.regNumber)}</div>
+                  </td>
+                  <td class="p-3 whitespace-nowrap">
+                    <span class="text-xs font-bold text-sky-800 bg-sky-50 px-2.5 py-1 rounded-lg border border-sky-200 inline-block">${escapeHtml(item.regNumber)}</span>
+                    ${renderDossierRegDateLine(item)}
+                  </td>
+                  <td class="p-3 text-xs text-slate-700">${escapeHtml(item.packaging)}</td>
+                  <td class="p-3 max-w-xs">
+                    <a href="${escapeHtml(item.fileUrl)}" target="_blank" class="text-xs font-semibold text-blue-700 hover:underline flex items-start gap-1.5">
+                      <svg class="w-4 h-4 shrink-0 mt-0.5 text-amber-500" fill="currentColor" viewBox="0 0 24 24"><path d="M7.71 3.5L1.15 15l3.43 6 6.55-11.5L7.71 3.5zm8.58 0H9.14l6.56 11.5h7.15L16.29 3.5zm-1.15 12.5H7.99L4.57 22h14.86l3.42-6H15.14z"/></svg>
+                      <span>${escapeHtml(item.driveContentDesc || 'Xem nội dung trên Google Drive')}</span>
+                    </a>
+                    <div class="text-[11px] text-slate-500 mt-1">Cập nhật Drive gần nhất: <strong class="text-slate-700">${escapeHtml(formatDateDDMMYYYY(item.driveUpdatedAt || item.updatedAt))}</strong></div>
                   </td>
                   <td class="p-3">
-                    <span class="inline-block px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 text-xs font-semibold border border-blue-100">${escapeHtml(item.docType)}</span>
-                    <div class="text-[11px] text-slate-400 mt-1">Cập nhật: ${escapeHtml(item.updatedAt)}</div>
+                    ${renderDossierClassificationCell(item)}
                   </td>
-                  <td class="p-3 text-xs text-slate-600 max-w-xs">${escapeHtml(item.notes)}</td>
                   <td class="p-3 text-right space-x-1.5 whitespace-nowrap">
-                    <a href="${escapeHtml(item.fileUrl)}" target="_blank" class="inline-block px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700">Mở file</a>
-                    <button onclick="sendSingleToZalo('zalo', '${item.id}')" class="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white">Gửi Zalo</button>
-                    ${isAdminMode ? `<button onclick="openAdminModal('zalo-dossier', '${item.id}')" class="px-2 py-1.5 rounded-lg text-xs bg-amber-100 text-amber-800">Sửa</button>
-                    <button onclick="deleteItem('zaloDossiers', '${item.id}')" class="px-2 py-1.5 rounded-lg text-xs bg-rose-100 text-rose-700">Xóa</button>` : ''}
+                    <a href="${escapeHtml(item.fileUrl)}" target="_blank" class="inline-block px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200">Mở xem file</a>
+                    <button onclick="openSingleProductSend('${item.id}')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-sm">Gửi</button>
+                    ${isAdminMode ? `
+                      <button onclick="openAdminModal('zalo-dossier', '${item.id}')" class="px-2 py-1.5 rounded-lg text-xs bg-amber-100 text-amber-800 font-semibold">Sửa</button>
+                      <button onclick="deleteItem('zaloDossiers', '${item.id}')" class="px-2 py-1.5 rounded-lg text-xs bg-rose-100 text-rose-700 font-semibold">Xóa</button>
+                    ` : ''}
                   </td>
                 </tr>
               `).join('')}
@@ -863,16 +1223,13 @@
     function renderTrainingSlides(container, highlightId) {
       container.innerHTML = `
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-200">
-          <div>
-            <h3 class="text-lg font-extrabold text-slate-900">2. Thư viện Slide đào tạo Sohaco</h3>
-            <p class="text-xs text-slate-500 mt-0.5">Chọn bài đào tạo đã được cập nhật để trình chiếu, học tập hoặc tải về.</p>
-          </div>
+          <div class="text-xs text-slate-600">Chủ đề đào tạo: <strong>Sản phẩm, GDP, pháp chế,...</strong></div>
           ${isAdminMode ? `<button onclick="openAdminModal('training-slides')" class="px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white">+ Cập nhật Slide mới</button>` : ''}
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
           ${appState.trainingSlides.map(s => `
-            <div class="rounded-2xl border ${highlightId === s.id ? 'border-amber-400 bg-amber-50/40' : 'border-slate-200 bg-slate-50/60'} p-4 flex flex-col justify-between hover:shadow-md transition">
+            <div id="item-${s.id}" class="rounded-2xl border ${highlightId === s.id ? 'border-amber-400 bg-amber-50/60 ring-2 ring-amber-300' : 'border-slate-200 bg-slate-50/60'} p-4 flex flex-col justify-between hover:shadow-md transition">
               <div>
                 <div class="flex items-center justify-between gap-2 mb-2">
                   <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700">${escapeHtml(s.category)}</span>
@@ -895,41 +1252,121 @@
       `;
     }
 
-    // --- MODULE 3: DANH MỤC SẢN PHẨM ---
+    // --- MODULE 3: DANH MỤC SẢN PHẨM (PHÂN NHÓM 1.1, 1.2 + MÃ ATC WHO + LINK CỤC QLD + MẪU & UP EXCEL) ---
+    function getCatalogGroups() {
+      const map = new Map();
+      appState.products.forEach(p => {
+        const key = `${p.groupCode || 'Khác'}__${p.groupName || 'Chưa phân nhóm'}`;
+        if (!map.has(key)) {
+          map.set(key, {
+            key,
+            code: p.groupCode || '',
+            name: p.groupName || 'Chưa phân nhóm',
+            count: 0
+          });
+        }
+        map.get(key).count++;
+      });
+      return Array.from(map.values()).sort((a, b) => a.code.localeCompare(b.code, undefined, { numeric: true }));
+    }
+
+    function selectCatalogGroup(groupKey) {
+      appState.activeCatalogGroup = groupKey;
+      saveState();
+      renderAccordionWorkspace();
+    }
+
+    function triggerCatalogExcelUpload() {
+      if (!isAdminMode) {
+        alert('Vui lòng đăng nhập quyền Quản trị (Admin) trước khi tải file Excel/CSV lên hệ thống!');
+        handleAdminAuthClick();
+        return;
+      }
+      document.getElementById('catalogExcelUploadInput').click();
+    }
+
     function renderProductCatalog(container, highlightId) {
+      const groups = getCatalogGroups();
+      const activeGroup = appState.activeCatalogGroup || 'ALL';
+      const list = activeGroup === 'ALL'
+        ? appState.products
+        : appState.products.filter(p => `${p.groupCode || 'Khác'}__${p.groupName || 'Chưa phân nhóm'}` === activeGroup);
+
       container.innerHTML = `
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-200">
-          <div>
-            <h3 class="text-lg font-extrabold text-slate-900">3. Danh mục sản phẩm Sohaco đang sử dụng</h3>
-            <p class="text-xs text-slate-500 mt-0.5">Tra cứu thông tin sản phẩm, tải danh mục Excel/CSV hoặc gửi thông tin sản phẩm cho khách hàng.</p>
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-4 border-b border-slate-200">
+          <div class="text-xs text-slate-600">
+            Phân loại thuốc theo <strong>mã ATC của WHO</strong>, nhãn nhóm sản phẩm (1.1, 1.2...) và liên kết tra cứu <strong>Cục Quản lý Dược Việt Nam</strong>.
           </div>
           <div class="flex flex-wrap gap-2">
-            <button onclick="exportCatalogCSV()" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-teal-600 hover:bg-teal-700 text-white">Tải danh mục (Excel/CSV)</button>
+            <button onclick="downloadSystemCatalogTemplate()" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-900 text-white shadow-sm">
+              Tải mẫu Excel/CSV hệ thống
+            </button>
+            <button onclick="triggerCatalogExcelUpload()" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm">
+              Tải lên từ Excel/CSV
+            </button>
+            <button onclick="exportCatalogCSV()" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-teal-600 hover:bg-teal-700 text-white">
+              Xuất danh mục hiện tại
+            </button>
             ${isAdminMode ? `<button onclick="openAdminModal('product-catalog')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-sky-700 hover:bg-sky-800 text-white">+ Thêm sản phẩm</button>` : ''}
           </div>
         </div>
 
+        <!-- Nhãn dán phân nhóm sản phẩm 1.1, 1.2, ... -->
+        <div class="mt-4">
+          <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">Phân nhóm sản phẩm:</div>
+          <div class="flex flex-wrap gap-2">
+            <button onclick="selectCatalogGroup('ALL')" class="px-3 py-1.5 rounded-full text-xs font-bold border transition ${activeGroup === 'ALL' ? 'bg-teal-700 text-white border-teal-700 shadow-sm' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-teal-50'}">
+              Tất cả (${appState.products.length})
+            </button>
+            ${groups.map(g => `
+              <button onclick="selectCatalogGroup('${escapeHtml(g.key)}')" class="px-3 py-1.5 rounded-full text-xs font-bold border transition flex items-center gap-1.5 ${activeGroup === g.key ? 'bg-teal-700 text-white border-teal-700 shadow-sm' : 'bg-teal-50/70 text-teal-900 border-teal-200 hover:bg-teal-100'}">
+                ${g.code ? `<span class="px-1.5 py-0.5 rounded bg-white/80 text-teal-900 text-[10px] font-extrabold">${escapeHtml(g.code)}</span>` : ''}
+                <span>${escapeHtml(g.name)}</span>
+                <span class="opacity-75">(${g.count})</span>
+              </button>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- Danh sách sản phẩm -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5">
-          ${appState.products.map(p => `
-            <div class="rounded-2xl border ${highlightId === p.id ? 'border-amber-400 bg-amber-50/40' : 'border-slate-200 bg-white'} p-4 shadow-sm hover:border-teal-400 transition">
-              <div class="flex items-start justify-between gap-2">
-                <div>
-                  <span class="text-[11px] font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-200">${escapeHtml(p.group)}</span>
-                  <h4 class="font-extrabold text-slate-900 text-base mt-1.5">${escapeHtml(p.name)}</h4>
-                  <div class="text-xs text-slate-500">Mã SP: <strong>${escapeHtml(p.code)}</strong> • ${escapeHtml(p.status)}</div>
+          ${list.map(p => `
+            <div id="item-${p.id}" class="rounded-2xl border ${highlightId === p.id ? 'border-amber-400 bg-amber-50/50 ring-2 ring-amber-300' : 'border-slate-200 bg-white'} p-4 shadow-sm hover:border-teal-400 transition flex flex-col justify-between">
+              <div>
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <div class="flex flex-wrap items-center gap-1.5">
+                    <span class="inline-flex items-center gap-1 text-[11px] font-bold text-teal-800 bg-teal-50 px-2.5 py-0.5 rounded-full border border-teal-200">
+                      ${p.groupCode ? `<span class="font-extrabold">${escapeHtml(p.groupCode)}</span>` : ''}
+                      <span>${escapeHtml(p.groupName || p.group || '')}</span>
+                    </span>
+                    ${p.atcCode ? `<span class="text-[11px] font-bold text-indigo-800 bg-indigo-50 px-2.5 py-0.5 rounded-full border border-indigo-200" title="Mã phân loại giải phẫu - điều trị - hóa học của WHO">ATC WHO: ${escapeHtml(p.atcCode)}</span>` : ''}
+                  </div>
+                  <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">${escapeHtml(p.status)}</span>
+                </div>
+
+                <h4 class="font-extrabold text-slate-900 text-base mt-2">${escapeHtml(p.name)}</h4>
+                <div class="text-xs text-slate-500">Mã SP: <strong>${escapeHtml(p.code)}</strong> ${p.regNumber ? `• Số ĐK: <strong class="text-sky-700">${escapeHtml(p.regNumber)}</strong>` : ''}</div>
+
+                <div class="mt-3 space-y-1.5 text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                  <div><strong>Hoạt chất:</strong> ${escapeHtml(p.ingredient)}</div>
+                  ${p.atcClass ? `<div><strong>Phân loại ATC (WHO):</strong> <span class="text-indigo-900 font-medium">${escapeHtml(p.atcClass)}</span></div>` : ''}
+                  <div><strong>Quy cách:</strong> ${escapeHtml(p.packaging)}</div>
+                  <div><strong>Nhà SX:</strong> ${escapeHtml(p.manufacturer)}</div>
+                  <div><strong>Thông tin giá/Kênh:</strong> ${escapeHtml(p.priceInfo)}</div>
                 </div>
               </div>
-              <div class="mt-3 space-y-1 text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100">
-                <div><strong>Hoạt chất:</strong> ${escapeHtml(p.ingredient)}</div>
-                <div><strong>Quy cách:</strong> ${escapeHtml(p.packaging)}</div>
-                <div><strong>Nhà SX:</strong> ${escapeHtml(p.manufacturer)}</div>
-                <div><strong>Thông tin giá/Kênh:</strong> ${escapeHtml(p.priceInfo)}</div>
-              </div>
-              <div class="mt-3 flex flex-wrap items-center justify-end gap-2">
-                <a href="${escapeHtml(p.docUrl)}" target="_blank" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700">Tải tài liệu SP</a>
-                <button onclick="sendProductToCustomer('${p.id}')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white">Gửi cho khách hàng</button>
-                ${isAdminMode ? `<button onclick="openAdminModal('product-catalog', '${p.id}')" class="px-2.5 py-1.5 rounded-lg text-xs bg-amber-100 text-amber-800">Sửa</button>
-                <button onclick="deleteItem('products', '${p.id}')" class="px-2.5 py-1.5 rounded-lg text-xs bg-rose-100 text-rose-700">Xóa</button>` : ''}
+
+              <div class="mt-3 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
+                <a href="${escapeHtml(p.davUrl || DAV_LOOKUP_URL)}" target="_blank" class="inline-flex items-center gap-1 text-xs font-bold text-sky-700 hover:text-sky-900 underline">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                  <span>Tra cứu Cục QLD (VN)</span>
+                </a>
+                <div class="flex flex-wrap items-center gap-1.5">
+                  <a href="${escapeHtml(p.docUrl)}" target="_blank" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700">Tải tài liệu</a>
+                  <button onclick="sendCatalogProductToCustomer('${p.id}')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white">Gửi khách</button>
+                  ${isAdminMode ? `<button onclick="openAdminModal('product-catalog', '${p.id}')" class="px-2.5 py-1.5 rounded-lg text-xs bg-amber-100 text-amber-800">Sửa</button>
+                  <button onclick="deleteItem('products', '${p.id}')" class="px-2.5 py-1.5 rounded-lg text-xs bg-rose-100 text-rose-700">Xóa</button>` : ''}
+                </div>
               </div>
             </div>
           `).join('')}
@@ -937,14 +1374,11 @@
       `;
     }
 
-    // --- MODULE 4: BIỂU MẪU GDP ---
+    // --- MODULE 4: GDP NGÀNH DƯỢC ---
     function renderGdpForms(container, highlightId) {
       container.innerHTML = `
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-200">
-          <div>
-            <h3 class="text-lg font-extrabold text-slate-900">4. Hệ thống biểu mẫu & SOP phục vụ công việc GDP</h3>
-            <p class="text-xs text-slate-500 mt-0.5">Cập nhật và sử dụng biểu mẫu Thực hành tốt phân phối thuốc (GDP) mới nhất của Sohaco.</p>
-          </div>
+          <div class="text-xs text-slate-600">Quản lý & tải xuống <strong>SOP hiện hành, các biểu mẫu về GDP</strong>.</div>
           ${isAdminMode ? `<button onclick="openAdminModal('gdp-forms')" class="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white">+ Cập nhật biểu mẫu GDP mới</button>` : ''}
         </div>
 
@@ -953,7 +1387,7 @@
             <thead>
               <tr class="bg-slate-50 text-slate-600 text-xs uppercase border-b border-slate-200">
                 <th class="p-3">Mã hiệu</th>
-                <th class="p-3">Tên biểu mẫu / Quy trình GDP</th>
+                <th class="p-3">Tên SOP / Biểu mẫu GDP</th>
                 <th class="p-3">Phiên bản & Hiệu lực</th>
                 <th class="p-3">Bộ phận áp dụng</th>
                 <th class="p-3 text-right">Thao tác</th>
@@ -961,7 +1395,7 @@
             </thead>
             <tbody class="divide-y divide-slate-100 text-sm">
               ${appState.gdpForms.map(g => `
-                <tr class="${highlightId === g.id ? 'bg-yellow-50' : 'hover:bg-slate-50'}">
+                <tr id="item-${g.id}" class="${highlightId === g.id ? 'bg-yellow-50 ring-2 ring-amber-300' : 'hover:bg-slate-50'}">
                   <td class="p-3 font-bold text-emerald-700 whitespace-nowrap">${escapeHtml(g.code)}</td>
                   <td class="p-3 font-semibold text-slate-900">${escapeHtml(g.title)}</td>
                   <td class="p-3 text-xs text-slate-600">
@@ -982,14 +1416,65 @@
       `;
     }
 
-    // --- MODULE 5: ĐÓNG GÓP Ý KIẾN & GOOGLE SHEETS ---
+    // --- MODULE 5: PHÁP LÝ & KÊ KHAI GIÁ DƯỢC ---
+    function renderLegalPricing(container, highlightId) {
+      container.innerHTML = `
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-200">
+          <div class="text-xs text-slate-600">Tra cứu nhanh Giấy phép ĐĐKKDD, GDP và Hồ sơ Kê khai / Kê khai lại giá thuốc theo quy định Bộ Y tế.</div>
+          <div class="flex flex-wrap gap-2">
+            <button onclick="extractSelectedLegal()" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white">Trích xuất gói hồ sơ (${selectedLegalIds.size})</button>
+            ${isAdminMode ? `<button onclick="openAdminModal('legal-pricing')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-sky-700 hover:bg-sky-800 text-white">+ Thêm hồ sơ</button>` : ''}
+          </div>
+        </div>
+
+        <div class="mt-4 overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-50 text-slate-600 text-xs uppercase border-b border-slate-200">
+                <th class="p-3 w-10 text-center">Chọn</th>
+                <th class="p-3">Số hiệu & Tên hồ sơ</th>
+                <th class="p-3">Phân loại & Cơ quan tiếp nhận</th>
+                <th class="p-3">Giá kê khai / Hiệu lực</th>
+                <th class="p-3 text-right">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-sm">
+              ${appState.legalPricing.map(l => `
+                <tr id="item-${l.id}" class="${highlightId === l.id ? 'bg-yellow-50 ring-2 ring-amber-300' : 'hover:bg-slate-50'}">
+                  <td class="p-3 text-center">
+                    <input type="checkbox" ${selectedLegalIds.has(l.id) ? 'checked' : ''} onchange="toggleSelection('legal', '${l.id}')" class="w-4 h-4 accent-rose-600 cursor-pointer" />
+                  </td>
+                  <td class="p-3">
+                    <div class="text-xs font-bold text-rose-700">${escapeHtml(l.code)}</div>
+                    <div class="font-bold text-slate-900">${escapeHtml(l.title)}</div>
+                  </td>
+                  <td class="p-3 text-xs">
+                    <span class="px-2 py-0.5 rounded bg-rose-50 text-rose-700 font-semibold border border-rose-200">${escapeHtml(l.category)}</span>
+                    <div class="text-slate-500 mt-1">${escapeHtml(l.authority)}</div>
+                  </td>
+                  <td class="p-3 text-xs text-slate-700">
+                    <div class="font-semibold">${escapeHtml(l.declaredPrice)}</div>
+                    <div class="text-slate-400">Ngày: ${escapeHtml(l.effectiveDate)}</div>
+                  </td>
+                  <td class="p-3 text-right space-x-1.5 whitespace-nowrap">
+                    <a href="${escapeHtml(l.fileUrl)}" target="_blank" class="inline-block px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700">Xem / Tải</a>
+                    <button onclick="sendSingleLegal('${l.id}')" class="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white">Gửi</button>
+                    ${isAdminMode ? `<button onclick="openAdminModal('legal-pricing', '${l.id}')" class="px-2 py-1.5 rounded-lg text-xs bg-amber-100 text-amber-800">Sửa</button>
+                    <button onclick="deleteItem('legalPricing', '${l.id}')" class="px-2 py-1.5 rounded-lg text-xs bg-rose-100 text-rose-700">Xóa</button>` : ''}
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    // --- MODULE 6: Ý KIẾN ĐÓNG GÓP ---
     function renderFeedbackModule(container) {
       container.innerHTML = `
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-200">
-          <div>
-            <h3 class="text-lg font-extrabold text-slate-900">5. Ghi nhận ý kiến đóng góp hoàn thiện Website</h3>
-            <p class="text-xs text-slate-500 mt-0.5">Góp ý được lưu trữ để hiệu chỉnh hệ thống, hỗ trợ liên kết Google Sheets (Google Excel) & tải về định kỳ cho Admin.</p>
-          </div>
+          <div class="text-xs text-slate-600">Đóng góp của bạn có thể giúp công ty hoàn thiện chức năng hơn. Admin có thể mở Google Sheets hoặc tải báo cáo định kỳ.</div>
           <div class="flex flex-wrap gap-2">
             <a href="${escapeHtml(appState.googleSheetUrl)}" target="_blank" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white">Mở Google Sheets</a>
             <button onclick="exportFeedbackCSV()" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white">Tải Excel/CSV định kỳ (${appState.feedbacks.length})</button>
@@ -997,7 +1482,6 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-5">
-          <!-- Form đóng góp -->
           <div class="lg:col-span-5 bg-slate-50 p-4 rounded-2xl border border-slate-200">
             <h4 class="font-bold text-sm text-slate-800 mb-3">Gửi ý kiến đóng góp mới</h4>
             <form onsubmit="submitFeedback(event)" class="space-y-3">
@@ -1012,11 +1496,11 @@
               <div>
                 <label class="block text-xs font-semibold text-slate-600 mb-1">Hạng mục cần hiệu chỉnh</label>
                 <select id="fbTopic" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm bg-white focus:border-sky-500 focus:outline-none">
-                  <option>Hồ sơ sản phẩm & Zalo</option>
+                  <option>Hồ sơ sản phẩm</option>
                   <option>Slide đào tạo</option>
                   <option>Danh mục sản phẩm</option>
-                  <option>Biểu mẫu GDP</option>
-                  <option>Hồ sơ pháp lý & Kê khai giá</option>
+                  <option>GDP ngành Dược</option>
+                  <option>Pháp lý & Kê khai giá Dược</option>
                   <option>Giao diện & Tìm kiếm</option>
                 </select>
               </div>
@@ -1031,13 +1515,12 @@
               <div class="mt-4 pt-4 border-t border-slate-200 space-y-2">
                 <div class="text-xs font-bold text-slate-700">Cấu hình Google Sheets (Admin):</div>
                 <input type="url" id="cfgSheetUrl" value="${escapeHtml(appState.googleSheetUrl)}" placeholder="Link Google Sheet xem/quản lý" class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs" />
-                <input type="url" id="cfgScriptUrl" value="${escapeHtml(appState.googleAppsScriptUrl)}" placeholder="URL Google Apps Script Web App (tùy chọn tự động đẩy dòng)" class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs" />
+                <input type="url" id="cfgScriptUrl" value="${escapeHtml(appState.googleAppsScriptUrl)}" placeholder="URL Google Apps Script Web App" class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs" />
                 <button onclick="saveGoogleSheetConfig()" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-white">Lưu cấu hình Sheet</button>
               </div>
             ` : ''}
           </div>
 
-          <!-- Danh sách ý kiến đã ghi nhận -->
           <div class="lg:col-span-7">
             <h4 class="font-bold text-sm text-slate-800 mb-3">Danh sách góp ý gần đây (Định kỳ Admin tải về để hiệu chỉnh)</h4>
             <div class="space-y-3 max-h-[430px] overflow-y-auto pr-1">
@@ -1057,138 +1540,298 @@
       `;
     }
 
-    // --- MODULE 6: HỒ SƠ PHÁP LÝ & KÊ KHAI GIÁ DƯỢC ---
-    function renderLegalPricing(container, highlightId) {
-      container.innerHTML = `
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-200">
-          <div>
-            <h3 class="text-lg font-extrabold text-slate-900">6. Trích xuất hồ sơ pháp lý & Kê khai giá ngành Dược Việt Nam</h3>
-            <p class="text-xs text-slate-500 mt-0.5">Tra cứu nhanh Giấy phép ĐĐKKDD, GDP và Hồ sơ Kê khai / Kê khai lại giá thuốc theo quy định Bộ Y tế.</p>
-          </div>
-          <div class="flex flex-wrap gap-2">
-            <button onclick="extractSelectedToZalo('legal')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white">Trích xuất gói hồ sơ (${selectedLegalIds.size})</button>
-            ${isAdminMode ? `<button onclick="openAdminModal('legal-pricing')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-sky-700 hover:bg-sky-800 text-white">+ Thêm hồ sơ</button>` : ''}
-          </div>
-        </div>
-
-        <div class="mt-4 overflow-x-auto">
-          <table class="w-full text-left border-collapse">
-            <thead>
-              <tr class="bg-slate-50 text-slate-600 text-xs uppercase border-b border-slate-200">
-                <th class="p-3 w-10 text-center">Chọn</th>
-                <th class="p-3">Số hiệu & Tên hồ sơ</th>
-                <th class="p-3">Phân loại & Cơ quan tiếp nhận</th>
-                <th class="p-3">Giá kê khai / Hiệu lực</th>
-                <th class="p-3 text-right">Thao tác</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100 text-sm">
-              ${appState.legalPricing.map(l => `
-                <tr class="${highlightId === l.id ? 'bg-yellow-50' : 'hover:bg-slate-50'}">
-                  <td class="p-3 text-center">
-                    <input type="checkbox" ${selectedLegalIds.has(l.id) ? 'checked' : ''} onchange="toggleSelection('legal', '${l.id}')" class="w-4 h-4 accent-rose-600 cursor-pointer" />
-                  </td>
-                  <td class="p-3">
-                    <div class="text-xs font-bold text-rose-700">${escapeHtml(l.code)}</div>
-                    <div class="font-bold text-slate-900">${escapeHtml(l.title)}</div>
-                  </td>
-                  <td class="p-3 text-xs">
-                    <span class="px-2 py-0.5 rounded bg-rose-50 text-rose-700 font-semibold border border-rose-200">${escapeHtml(l.category)}</span>
-                    <div class="text-slate-500 mt-1">${escapeHtml(l.authority)}</div>
-                  </td>
-                  <td class="p-3 text-xs text-slate-700">
-                    <div class="font-semibold">${escapeHtml(l.declaredPrice)}</div>
-                    <div class="text-slate-400">Ngày: ${escapeHtml(l.effectiveDate)}</div>
-                  </td>
-                  <td class="p-3 text-right space-x-1.5 whitespace-nowrap">
-                    <a href="${escapeHtml(l.fileUrl)}" target="_blank" class="inline-block px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700">Xem / Tải</a>
-                    <button onclick="sendSingleToZalo('legal', '${l.id}')" class="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white">Gửi Zalo</button>
-                    ${isAdminMode ? `<button onclick="openAdminModal('legal-pricing', '${l.id}')" class="px-2 py-1.5 rounded-lg text-xs bg-amber-100 text-amber-800">Sửa</button>
-                    <button onclick="deleteItem('legalPricing', '${l.id}')" class="px-2 py-1.5 rounded-lg text-xs bg-rose-100 text-rose-700">Xóa</button>` : ''}
-                  </td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-        </div>
-      `;
-    }
-
-    // -------------------- 5. ZALO EXTRACTION & SHARING --------------------
+    // -------------------- 7. THÔNG TIN GỬI KHÁCH & CHIA SẺ MOBILE / DESKTOP --------------------
     function toggleSelection(type, id) {
       const set = type === 'zalo' ? selectedZaloIds : selectedLegalIds;
       if (set.has(id)) set.delete(id);
       else set.add(id);
-      renderActiveModule();
+      renderAccordionWorkspace();
     }
 
-    function sendSingleToZalo(type, id) {
-      if (type === 'zalo') {
-        const item = appState.zaloDossiers.find(x => x.id === id);
-        if (!item) return;
-        openZaloModal(`[SOHACO] Gửi Quý khách hàng hồ sơ sản phẩm:\n• Sản phẩm: ${item.productName}\n• Số ĐK: ${item.regNumber}\n• Tài liệu: ${item.docType}\n• Link tải hồ sơ: ${item.fileUrl}\n(${item.notes})`);
-      } else {
-        const item = appState.legalPricing.find(x => x.id === id);
-        if (!item) return;
-        openZaloModal(`[SOHACO] Hồ sơ Pháp lý & Kê khai giá Dược:\n• Văn bản: ${item.title} (${item.code})\n• Cơ quan: ${item.authority}\n• Thông tin giá/Hiệu lực: ${item.declaredPrice} (${item.effectiveDate})\n• Link tải: ${item.fileUrl}`);
+    function toggleSelectAllZalo(productType, checked) {
+      const list = appState.zaloDossiers.filter(x => x.productType === productType);
+      list.forEach(item => {
+        if (checked) selectedZaloIds.add(item.id);
+        else selectedZaloIds.delete(item.id);
+      });
+      renderAccordionWorkspace();
+    }
+
+    function formatSingleProductMessage(item) {
+      return `[SOHACO] Gửi Quý khách hàng hồ sơ sản phẩm:\n• Sản phẩm: ${item.productName}\n• Số Đăng ký: ${item.regNumber}\n• Quy cách: ${item.packaging}\n• Link tải hồ sơ: ${item.fileUrl}`;
+    }
+
+    function openSingleProductSend(id) {
+      const item = appState.zaloDossiers.find(x => x.id === id);
+      if (!item) return;
+      openSendCustomerModal(formatSingleProductMessage(item));
+    }
+
+    function sendSelectedDossiers() {
+      if (selectedZaloIds.size === 0) {
+        alert('Vui lòng tích chọn ít nhất 1 dòng hồ sơ sản phẩm!');
+        return;
       }
-    }
-
-    function extractSelectedToZalo(type) {
-      if (type === 'zalo') {
-        if (selectedZaloIds.size === 0) {
-          alert('Vui lòng tích chọn ít nhất 1 hồ sơ sản phẩm để trích xuất!');
-          return;
-        }
-        const items = appState.zaloDossiers.filter(x => selectedZaloIds.has(x.id));
-        const body = items.map((item, idx) => `${idx + 1}. ${item.productName} (${item.regNumber})\n   - Hồ sơ: ${item.docType}\n   - Link tải: ${item.fileUrl}`).join('\n\n');
-        openZaloModal(`[SOHACO] Kính gửi Quý khách hàng bộ hồ sơ sản phẩm:\n\n${body}\n\nTrân trọng cảm ơn!`);
-      } else {
-        if (selectedLegalIds.size === 0) {
-          alert('Vui lòng tích chọn ít nhất 1 hồ sơ pháp lý/kê khai giá!');
-          return;
-        }
-        const items = appState.legalPricing.filter(x => selectedLegalIds.has(x.id));
-        const body = items.map((item, idx) => `${idx + 1}. ${item.title} [${item.code}]\n   - Giá/Hiệu lực: ${item.declaredPrice} (${item.effectiveDate})\n   - Link tải: ${item.fileUrl}`).join('\n\n');
-        openZaloModal(`[SOHACO] Trích xuất Hồ sơ Pháp lý & Kê khai giá Dược:\n\n${body}`);
+      const items = appState.zaloDossiers.filter(x => selectedZaloIds.has(x.id));
+      if (items.length === 1) {
+        openSendCustomerModal(formatSingleProductMessage(items[0]));
+        return;
       }
+      const body = items.map(item =>
+        `• Sản phẩm: ${item.productName}\n• Số Đăng ký: ${item.regNumber}\n• Quy cách: ${item.packaging}\n• Link tải hồ sơ: ${item.fileUrl}`
+      ).join('\n\n');
+      openSendCustomerModal(`[SOHACO] Gửi Quý khách hàng hồ sơ sản phẩm:\n\n${body}`);
     }
 
-    function sendProductToCustomer(productId) {
+    function sendCatalogProductToCustomer(productId) {
       const p = appState.products.find(x => x.id === productId);
       if (!p) return;
-      openZaloModal(`[SOHACO] Thông tin sản phẩm gửi Quý khách:\n• Tên sản phẩm: ${p.name} (${p.code})\n• Hoạt chất: ${p.ingredient}\n• Quy cách: ${p.packaging}\n• Thông tin: ${p.priceInfo}\n• Chi tiết: ${p.docUrl}`);
+      openSendCustomerModal(`[SOHACO] Gửi Quý khách hàng hồ sơ sản phẩm:\n• Sản phẩm: ${p.name}\n• Số Đăng ký: ${p.regNumber || p.code}\n• Quy cách: ${p.packaging}\n• Link tải hồ sơ: ${p.docUrl}`);
     }
 
-    function openZaloModal(text) {
-      document.getElementById('zaloMessageText').value = text;
-      document.getElementById('zaloModal').classList.remove('hidden');
+    function sendSingleLegal(id) {
+      const item = appState.legalPricing.find(x => x.id === id);
+      if (!item) return;
+      openSendCustomerModal(`[SOHACO] Hồ sơ Pháp lý & Kê khai giá Dược:\n• Văn bản: ${item.title} (${item.code})\n• Cơ quan: ${item.authority}\n• Thông tin giá/Hiệu lực: ${item.declaredPrice} (${item.effectiveDate})\n• Link tải hồ sơ: ${item.fileUrl}`);
     }
 
-    function copyZaloTextOnly() {
-      const text = document.getElementById('zaloMessageText').value;
-      navigator.clipboard.writeText(text).then(() => showToast('Đã sao chép nội dung vào bộ nhớ tạm!'));
+    function extractSelectedLegal() {
+      if (selectedLegalIds.size === 0) {
+        alert('Vui lòng tích chọn ít nhất 1 hồ sơ pháp lý/kê khai giá!');
+        return;
+      }
+      const items = appState.legalPricing.filter(x => selectedLegalIds.has(x.id));
+      const body = items.map((item, idx) => `${idx + 1}. ${item.title} [${item.code}]\n   - Giá/Hiệu lực: ${item.declaredPrice} (${item.effectiveDate})\n   - Link tải: ${item.fileUrl}`).join('\n\n');
+      openSendCustomerModal(`[SOHACO] Trích xuất Hồ sơ Pháp lý & Kê khai giá Dược:\n\n${body}`);
     }
 
-    function copyAndOpenZalo() {
-      const text = document.getElementById('zaloMessageText').value;
-      navigator.clipboard.writeText(text).then(() => {
-        showToast('Đã sao chép! Đang mở Zalo...');
+    function openSendCustomerModal(text) {
+      renderLogo();
+      document.getElementById('customerShareText').value = text;
+      document.getElementById('desktopShareOptions').classList.add('hidden');
+      document.getElementById('sendCustomerModal').classList.remove('hidden');
+    }
+
+    function copyCustomerShareText() {
+      const text = document.getElementById('customerShareText').value;
+      navigator.clipboard.writeText(text).then(() => showToast('Đã sao chép nội dung gửi khách!'));
+    }
+
+    function isMobileDevice() {
+      return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+    }
+
+    async function handleSendToCustomerAction() {
+      const text = document.getElementById('customerShareText').value;
+      try { await navigator.clipboard.writeText(text); } catch (e) {}
+
+      if (isMobileDevice()) {
         if (navigator.share) {
-          navigator.share({ title: 'Hồ sơ Sohaco', text }).catch(() => window.open('https://chat.zalo.me/', '_blank'));
-        } else {
-          window.open('https://chat.zalo.me/', '_blank');
+          try {
+            await navigator.share({ title: 'Sohaco - Thông tin gửi khách', text });
+            return;
+          } catch (err) {
+            if (err.name === 'AbortError') return;
+          }
         }
+        showToast('Đã sao chép nội dung! Đang mở Zalo...');
+        window.open('https://zalo.me/', '_blank');
+      } else {
+        document.getElementById('desktopShareOptions').classList.remove('hidden');
+        showToast('Đã sao chép nội dung! Hãy chọn ứng dụng gửi bên dưới.');
+      }
+    }
+
+    function launchZaloDesktopOrWeb() {
+      const text = document.getElementById('customerShareText').value;
+      navigator.clipboard.writeText(text).catch(() => {});
+      window.open('https://chat.zalo.me/', '_blank');
+      showToast('Đã sao chép nội dung & mở Zalo!');
+    }
+
+    function launchMailClient() {
+      const text = document.getElementById('customerShareText').value;
+      const subject = encodeURIComponent('[SOHACO] Thông tin hồ sơ sản phẩm gửi Quý khách hàng');
+      const body = encodeURIComponent(text);
+      window.location.href = `mailto:?subject=${subject}&body=${body}`;
+    }
+
+    function launchGmailWeb() {
+      const text = document.getElementById('customerShareText').value;
+      const subject = encodeURIComponent('[SOHACO] Thông tin hồ sơ sản phẩm gửi Quý khách hàng');
+      const body = encodeURIComponent(text);
+      window.open(`https://mail.google.com/mail/?view=cm&fs=1&su=${subject}&body=${body}`, '_blank');
+    }
+
+    async function trySystemWebShare() {
+      const text = document.getElementById('customerShareText').value;
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: 'Sohaco - Thông tin gửi khách', text });
+        } catch (e) {}
+      } else {
+        alert('Trình duyệt máy tính này không hỗ trợ chia sẻ hệ thống trực tiếp. Bạn hãy dùng nút Zalo hoặc Mail bên cạnh nhé!');
+      }
+    }
+
+    // -------------------- 8. EXCEL / CSV TEMPLATE & IMPORT (MODULE 3) --------------------
+    const CATALOG_TEMPLATE_HEADERS = [
+      'Mã nhóm (VD: 1.1)',
+      'Tên nhóm sản phẩm (VD: Thuốc - Kháng sinh)',
+      'Mã SP',
+      'Tên sản phẩm',
+      'Hoạt chất',
+      'Mã ATC (WHO)',
+      'Phân loại ATC (WHO)',
+      'Số đăng ký',
+      'Quy cách',
+      'Nhà sản xuất',
+      'Link Cục QLD Việt Nam',
+      'Thông tin giá/Kênh',
+      'Trạng thái',
+      'Link tài liệu'
+    ];
+
+    function downloadSystemCatalogTemplate() {
+      const sampleRows = [
+        [
+          '1.1', 'Thuốc - Kháng sinh', 'SHC-KS09', 'Sohaco-Amoxicillin 500mg',
+          'Amoxicillin 500mg', 'J01CA04', 'Kháng khuẩn nhóm Beta-lactam Penicillin (WHO)',
+          'VD-34567-25', 'Hộp 10 vỉ x 10 viên nang', 'Nhà máy Sohaco / GMP-WHO',
+          DAV_LOOKUP_URL, 'Kênh OTC & ETC', 'Đang kinh doanh', 'https://drive.google.com/'
+        ],
+        [
+          '1.2', 'Thuốc - Giảm đau, hạ sốt', 'SHC-GD10', 'Sohaco-Ibuprofen 400mg',
+          'Ibuprofen 400mg', 'M01AE01', 'Thuốc chống viêm, giảm đau NSAID - Dẫn xuất acid propionic (WHO)',
+          'VD-35678-25', 'Hộp 5 vỉ x 10 viên nén bao phim', 'Nhà máy Sohaco / GMP-WHO',
+          DAV_LOOKUP_URL, 'Theo bảng kê khai giá', 'Đang kinh doanh', 'https://drive.google.com/'
+        ]
+      ];
+
+      if (window.XLSX) {
+        const ws = XLSX.utils.aoa_to_sheet([CATALOG_TEMPLATE_HEADERS, ...sampleRows]);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Mau_Danh_Muc_Sohaco');
+        XLSX.writeFile(wb, 'Sohaco-Mau-Excel-Danh-Muc-SP.xlsx');
+        showToast('Đã tải mẫu Excel hệ thống (.xlsx)!');
+      } else {
+        downloadCSV(CATALOG_TEMPLATE_HEADERS, sampleRows, 'Sohaco-Mau-CSV-Danh-Muc-SP.csv');
+      }
+    }
+
+    function exportCatalogCSV() {
+      const rows = appState.products.map(p => [
+        p.groupCode || '', p.groupName || '', p.code, p.name, p.ingredient,
+        p.atcCode || '', p.atcClass || '', p.regNumber || '', p.packaging,
+        p.manufacturer, p.davUrl || DAV_LOOKUP_URL, p.priceInfo, p.status, p.docUrl
+      ]);
+      if (window.XLSX) {
+        const ws = XLSX.utils.aoa_to_sheet([CATALOG_TEMPLATE_HEADERS, ...rows]);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Danh_Muc_Sohaco');
+        XLSX.writeFile(wb, 'Sohaco-Danh-Muc-San-Pham.xlsx');
+        showToast('Đã xuất danh mục Excel (.xlsx)!');
+      } else {
+        downloadCSV(CATALOG_TEMPLATE_HEADERS, rows, 'Sohaco-Danh-Muc-San-Pham.csv');
+      }
+    }
+
+    function handleCatalogExcelUpload(event) {
+      const file = event.target.files[0];
+      event.target.value = '';
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          let rows = [];
+          if (window.XLSX) {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+            rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '' });
+          } else {
+            const text = new TextDecoder('utf-8').decode(e.target.result);
+            rows = parseSimpleCSV(text);
+          }
+
+          if (rows.length < 2) {
+            alert('File không có dữ liệu sản phẩm (cần có dòng tiêu đề và ít nhất 1 dòng sản phẩm).');
+            return;
+          }
+
+          const imported = [];
+          for (let i = 1; i < rows.length; i++) {
+            const r = rows[i];
+            if (!r || r.every(cell => !String(cell || '').trim())) continue;
+            const name = String(r[3] || '').trim();
+            if (!name) continue;
+
+            imported.push({
+              id: 'p_' + Date.now() + '_' + i,
+              groupCode: String(r[0] || '1.1').trim(),
+              groupName: String(r[1] || 'Sản phẩm chung').trim(),
+              code: String(r[2] || ('SHC-' + i)).trim(),
+              name,
+              ingredient: String(r[4] || '').trim(),
+              atcCode: String(r[5] || '').trim(),
+              atcClass: String(r[6] || '').trim(),
+              regNumber: String(r[7] || '').trim(),
+              packaging: String(r[8] || '').trim(),
+              manufacturer: String(r[9] || '').trim(),
+              davUrl: String(r[10] || DAV_LOOKUP_URL).trim() || DAV_LOOKUP_URL,
+              priceInfo: String(r[11] || '').trim(),
+              status: String(r[12] || 'Đang kinh doanh').trim(),
+              docUrl: String(r[13] || '').trim()
+            });
+          }
+
+          if (imported.length === 0) {
+            alert('Không đọc được sản phẩm hợp lệ từ file. Vui lòng kiểm tra đúng cột theo "Tải mẫu Excel/CSV hệ thống".');
+            return;
+          }
+
+          const replaceAll = confirm(`Tìm thấy ${imported.length} sản phẩm trong file.\n• Bấm OK để BỔ SUNG thêm vào danh mục hiện có.\n• Bấm Cancel để THAY THẾ toàn bộ danh mục hiện tại? (Chọn OK để thêm mới, hoặc thao tác lại)`);
+          if (replaceAll) {
+            appState.products = [...imported, ...appState.products];
+          } else {
+            if (!confirm('Xác nhận THAY THẾ toàn bộ danh mục sản phẩm hiện tại bằng dữ liệu từ file vừa tải lên?')) return;
+            appState.products = imported;
+          }
+
+          appState.activeCatalogGroup = 'ALL';
+          saveState();
+          renderAccordionWorkspace();
+          showToast(`Đã cập nhật ${imported.length} sản phẩm từ file Excel/CSV!`);
+        } catch (err) {
+          console.error(err);
+          alert('Có lỗi khi đọc file Excel/CSV. Hãy thử dùng đúng file từ nút "Tải mẫu Excel/CSV hệ thống".');
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    function parseSimpleCSV(text) {
+      return text.replace(/^\uFEFF/, '').split(/\r?\n/).map(line => {
+        const res = [];
+        let cur = '', inQuotes = false;
+        for (let i = 0; i < line.length; i++) {
+          const ch = line[i];
+          if (ch === '"') {
+            if (inQuotes && line[i + 1] === '"') { cur += '"'; i++; }
+            else inQuotes = !inQuotes;
+          } else if (ch === ',' && !inQuotes) {
+            res.push(cur); cur = '';
+          } else {
+            cur += ch;
+          }
+        }
+        res.push(cur);
+        return res;
       });
     }
 
-    function downloadExtractedText() {
-      const text = document.getElementById('zaloMessageText').value;
-      const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
-      triggerDownload(blob, 'Sohaco-Trich-Xuat-Ho-So.txt');
-    }
-
-    // -------------------- 6. FEEDBACK & EXCEL / CSV EXPORT --------------------
+    // -------------------- 9. FEEDBACK & CSV EXPORT --------------------
     async function submitFeedback(e) {
       e.preventDefault();
       const sender = document.getElementById('fbSender').value.trim();
@@ -1201,7 +1844,6 @@
       appState.feedbacks.unshift(newFb);
       saveState();
 
-      // Nếu Admin đã cấu hình Google Apps Script Web App URL -> gửi trực tiếp lên Google Sheet
       if (appState.googleAppsScriptUrl) {
         try {
           await fetch(appState.googleAppsScriptUrl, {
@@ -1212,13 +1854,13 @@
           });
           showToast('Đã gửi góp ý & đồng bộ lên Google Sheets!');
         } catch (err) {
-          showToast('Đã lưu góp ý cục bộ (kiểm tra lại link Apps Script).');
+          showToast('Đã lưu góp ý cục bộ.');
         }
       } else {
         showToast('Đã ghi nhận ý kiến đóng góp thành công!');
       }
 
-      renderFeedbackModule(document.getElementById('workspaceContainer'));
+      renderAccordionWorkspace();
     }
 
     function saveGoogleSheetConfig() {
@@ -1234,12 +1876,6 @@
       downloadCSV(headers, rows, 'Sohaco-Dong-Gop-Y-Kien.csv');
     }
 
-    function exportCatalogCSV() {
-      const headers = ['Mã SP', 'Tên sản phẩm', 'Hoạt chất', 'Nhóm điều trị', 'Quy cách', 'Nhà SX', 'Ghi chú giá', 'Trạng thái', 'Link tài liệu'];
-      const rows = appState.products.map(p => [p.code, p.name, p.ingredient, p.group, p.packaging, p.manufacturer, p.priceInfo, p.status, p.docUrl]);
-      downloadCSV(headers, rows, 'Sohaco-Danh-Muc-San-Pham.csv');
-    }
-
     function downloadCSV(headers, rows, filename) {
       const escapeCsv = val => `"${String(val || '').replace(/"/g, '""')}"`;
       const csvContent = '\uFEFF' + [headers.map(escapeCsv).join(','), ...rows.map(r => r.map(escapeCsv).join(','))].join('\n');
@@ -1248,25 +1884,14 @@
       showToast(`Đã xuất file ${filename}`);
     }
 
-    // -------------------- 7. ADMIN CRUD MODAL --------------------
+    // -------------------- 10. ADMIN CRUD MODAL (DYNAMIC FIELDS FOR MODULE 1) --------------------
     const MODULE_SCHEMAS = {
-      'zalo-dossier': {
-        key: 'zaloDossiers',
-        title: 'Hồ sơ sản phẩm (Gửi Zalo)',
-        fields: [
-          { name: 'productName', label: 'Tên sản phẩm', required: true },
-          { name: 'regNumber', label: 'Số đăng ký / Số công bố', required: true },
-          { name: 'docType', label: 'Loại hồ sơ đính kèm (VD: COA + HDSD + ĐK)', required: true },
-          { name: 'fileUrl', label: 'Đường dẫn file (Google Drive / SharePoint / Link)', required: true },
-          { name: 'notes', label: 'Ghi chú cho đội Sale' }
-        ]
-      },
       'training-slides': {
         key: 'trainingSlides',
         title: 'Slide đào tạo',
         fields: [
           { name: 'title', label: 'Tiêu đề bài đào tạo', required: true },
-          { name: 'category', label: 'Chủ đề (VD: Sản phẩm mới, Kỹ năng Sale, GDP)', required: true },
+          { name: 'category', label: 'Chủ đề (Sản phẩm, GDP, Pháp chế,...)', required: true },
           { name: 'author', label: 'Bộ phận biên soạn', required: true },
           { name: 'format', label: 'Định dạng (VD: Google Slides / PPTX / PDF)', required: true },
           { name: 'slideUrl', label: 'Link mở / tải Slide', required: true },
@@ -1277,12 +1902,17 @@
         key: 'products',
         title: 'Sản phẩm trong Danh mục',
         fields: [
+          { name: 'groupCode', label: 'Mã nhóm (VD: 1.1, 1.2, 2.1)', required: true },
+          { name: 'groupName', label: 'Tên nhóm sản phẩm (VD: Thuốc - Kháng sinh)', required: true },
           { name: 'code', label: 'Mã sản phẩm', required: true },
-          { name: 'name', label: 'Tên biệt dược / Sản phẩm', required: true },
+          { name: 'name', label: 'Tên sản phẩm', required: true },
           { name: 'ingredient', label: 'Hoạt chất chính', required: true },
-          { name: 'group', label: 'Nhóm điều trị', required: true },
+          { name: 'atcCode', label: 'Mã ATC (WHO) (VD: J01DD08)' },
+          { name: 'atcClass', label: 'Mô tả phân loại ATC (WHO)' },
+          { name: 'regNumber', label: 'Số đăng ký / Số lưu hành' },
           { name: 'packaging', label: 'Quy cách đóng gói', required: true },
           { name: 'manufacturer', label: 'Nhà sản xuất / Tiêu chuẩn' },
+          { name: 'davUrl', label: 'Link tra cứu Cục Quản lý Dược VN' },
           { name: 'priceInfo', label: 'Thông tin giá / Kênh phân phối' },
           { name: 'status', label: 'Trạng thái (VD: Đang kinh doanh)' },
           { name: 'docUrl', label: 'Link tài liệu sản phẩm' }
@@ -1290,10 +1920,10 @@
       },
       'gdp-forms': {
         key: 'gdpForms',
-        title: 'Biểu mẫu GDP',
+        title: 'SOP / Biểu mẫu GDP ngành Dược',
         fields: [
-          { name: 'code', label: 'Mã hiệu biểu mẫu (VD: BM-GDP-01)', required: true },
-          { name: 'title', label: 'Tên biểu mẫu / Quy trình GDP', required: true },
+          { name: 'code', label: 'Mã hiệu (VD: SOP-GDP-01 / BM-GDP-01)', required: true },
+          { name: 'title', label: 'Tên SOP / Biểu mẫu GDP', required: true },
           { name: 'version', label: 'Phiên bản (VD: Phiên bản 4.0)', required: true },
           { name: 'effectiveDate', label: 'Ngày hiệu lực (DD/MM/YYYY)', required: true },
           { name: 'department', label: 'Bộ phận áp dụng', required: true },
@@ -1315,23 +1945,110 @@
       }
     };
 
-    function openAdminModal(moduleName, itemId = '') {
-      const schema = MODULE_SCHEMAS[moduleName];
-      if (!schema) return;
+    function getDossierFieldsByProductType(pType) {
+      const base = [
+        { name: 'productType', label: 'Loại sản phẩm', type: 'select', options: PRODUCT_TYPES, required: true, onChange: 'onAdminProductTypeChange(this.value)' },
+        { name: 'productName', label: 'Tên sản phẩm', required: true },
+        { name: 'regNumber', label: 'Số lưu hành / Số đăng ký', required: true }
+      ];
 
+      if (pType === 'Thuốc' || pType === 'Mỹ phẩm') {
+        base.push({ name: 'regDate', label: 'Ngày hết hạn số đăng ký', type: 'date', required: true });
+      } else if (pType === 'Thiết bị y tế') {
+        base.push({ name: 'regDate', label: 'Ngày tiếp nhận', type: 'date', required: true });
+      }
+      // Thực phẩm chức năng: không có trường ngày dưới số đăng ký
+
+      base.push(
+        { name: 'packaging', label: 'Quy cách sản phẩm', required: true },
+        { name: 'driveContentDesc', label: 'Nội dung hồ sơ có trong Google Drive', required: true },
+        { name: 'fileUrl', label: 'Đường link Google Drive', required: true },
+        { name: 'driveUpdatedAt', label: 'Ngày cập nhật lên Drive gần nhất', type: 'date', required: true }
+      );
+
+      if (pType === 'Thuốc') {
+        base.push(
+          { name: 'prescriptionType', label: 'Phân loại kê đơn', type: 'select', options: ['Thuốc kê đơn', 'Thuốc không kê đơn'], required: true },
+          { name: 'essentialType', label: 'Phân loại thiết yếu', type: 'select', options: ['Thuốc thiết yếu', 'Thuốc không thiết yếu'], required: true }
+        );
+      } else if (pType === 'Thực phẩm chức năng') {
+        base.push(
+          { name: 'priceDeclStatus', label: 'Phân loại kê khai giá', type: 'select', options: ['Kê khai giá', 'Không kê khai giá'], required: true },
+          { name: 'ageGroup', label: 'Độ tuổi sử dụng', type: 'select', options: ['Từ 0 tuổi trở lên', 'Từ 1 tuổi trở lên', 'Từ 6 tuổi trở lên'], required: true }
+        );
+      } else if (pType === 'Thiết bị y tế') {
+        base.push(
+          { name: 'deviceClass', label: 'Phân loại thiết bị y tế', type: 'select', options: ['Loại A', 'Loại B', 'Loại C', 'Loại D'], required: true }
+        );
+      }
+      // Mỹ phẩm: Cột phân loại để trống nên không hiện trường phân loại
+
+      return base;
+    }
+
+    let _currentEditingDraft = {};
+
+    function renderAdminFieldsHtml(fields, valuesObj) {
+      return fields.map(f => {
+        let val = valuesObj?.[f.name] || '';
+        if (f.type === 'date') val = toInputDateYYYYMMDD(val);
+
+        if (f.type === 'select') {
+          return `
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">${f.label} ${f.required ? '<span class="text-rose-500">*</span>' : ''}</label>
+              <select name="${f.name}" ${f.required ? 'required' : ''} ${f.onChange ? `onchange="${f.onChange}"` : ''} class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm bg-white focus:border-sky-500 focus:outline-none">
+                ${f.options.map(opt => `<option value="${escapeHtml(opt)}" ${val === opt ? 'selected' : ''}>${escapeHtml(opt)}</option>`).join('')}
+              </select>
+            </div>
+          `;
+        }
+        return `
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">${f.label} ${f.required ? '<span class="text-rose-500">*</span>' : ''}</label>
+            <input type="${f.type === 'date' ? 'date' : 'text'}" name="${f.name}" ${f.required ? 'required' : ''} value="${escapeHtml(val)}" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:border-sky-500 focus:outline-none" />
+          </div>
+        `;
+      }).join('');
+    }
+
+    function onAdminProductTypeChange(newType) {
+      const form = document.getElementById('adminItemForm');
+      const fd = new FormData(form);
+      const draft = {};
+      for (const [k, v] of fd.entries()) draft[k] = v;
+      draft.productType = newType;
+      _currentEditingDraft = draft;
+      const fields = getDossierFieldsByProductType(newType);
+      document.getElementById('adminFormFields').innerHTML = renderAdminFieldsHtml(fields, draft);
+    }
+
+    function openAdminModal(moduleName, itemId = '') {
       document.getElementById('editItemModule').value = moduleName;
       document.getElementById('editItemId').value = itemId;
+
+      if (moduleName === 'zalo-dossier') {
+        const existing = itemId
+          ? appState.zaloDossiers.find(x => x.id === itemId)
+          : {
+              productType: appState.activeProductType || 'Thuốc',
+              driveUpdatedAt: new Date().toISOString().slice(0, 10)
+            };
+        _currentEditingDraft = { ...existing };
+        document.getElementById('adminModalTitle').textContent = (itemId ? 'Chỉnh sửa: ' : 'Thêm mới: ') + 'Hồ sơ sản phẩm';
+        const fields = getDossierFieldsByProductType(existing.productType || 'Thuốc');
+        document.getElementById('adminFormFields').innerHTML = renderAdminFieldsHtml(fields, existing);
+        document.getElementById('adminItemModal').classList.remove('hidden');
+        return;
+      }
+
+      const schema = MODULE_SCHEMAS[moduleName];
+      if (!schema) return;
       document.getElementById('adminModalTitle').textContent = (itemId ? 'Chỉnh sửa: ' : 'Thêm mới: ') + schema.title;
-
-      const existing = itemId ? appState[schema.key].find(x => x.id === itemId) : {};
-      const fieldsHtml = schema.fields.map(f => `
-        <div>
-          <label class="block text-xs font-semibold text-slate-600 mb-1">${f.label} ${f.required ? '<span class="text-rose-500">*</span>' : ''}</label>
-          <input type="text" name="${f.name}" ${f.required ? 'required' : ''} value="${escapeHtml(existing?.[f.name] || '')}" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:border-sky-500 focus:outline-none" />
-        </div>
-      `).join('');
-
-      document.getElementById('adminFormFields').innerHTML = fieldsHtml;
+      const existing = itemId
+        ? appState[schema.key].find(x => x.id === itemId)
+        : (moduleName === 'product-catalog' ? { davUrl: DAV_LOOKUP_URL, status: 'Đang kinh doanh' } : {});
+      document.getElementById('adminFormFields').innerHTML = renderAdminFieldsHtml(schema.fields, existing);
       document.getElementById('adminItemModal').classList.remove('hidden');
     }
 
@@ -1339,9 +2056,34 @@
       e.preventDefault();
       const moduleName = document.getElementById('editItemModule').value;
       const itemId = document.getElementById('editItemId').value;
-      const schema = MODULE_SCHEMAS[moduleName];
       const formData = new FormData(e.target);
 
+      if (moduleName === 'zalo-dossier') {
+        const pType = formData.get('productType')?.toString().trim() || 'Thuốc';
+        const fields = getDossierFieldsByProductType(pType);
+        const newObj = {
+          id: itemId || ('zd_' + Date.now()),
+          updatedAt: new Date().toLocaleDateString('vi-VN')
+        };
+        fields.forEach(f => {
+          newObj[f.name] = formData.get(f.name)?.toString().trim() || '';
+        });
+
+        appState.activeProductType = pType;
+        if (itemId) {
+          const idx = appState.zaloDossiers.findIndex(x => x.id === itemId);
+          if (idx !== -1) appState.zaloDossiers[idx] = newObj;
+        } else {
+          appState.zaloDossiers.unshift(newObj);
+        }
+        saveState();
+        closeModal('adminItemModal');
+        renderAccordionWorkspace();
+        showToast('Đã lưu cập nhật Hồ sơ sản phẩm!');
+        return;
+      }
+
+      const schema = MODULE_SCHEMAS[moduleName];
       const newObj = {
         id: itemId || ('id_' + Date.now()),
         updatedAt: new Date().toLocaleDateString('vi-VN')
@@ -1359,7 +2101,7 @@
 
       saveState();
       closeModal('adminItemModal');
-      renderActiveModule();
+      renderAccordionWorkspace();
       showToast('Đã lưu cập nhật dữ liệu thành công!');
     }
 
@@ -1367,11 +2109,11 @@
       if (!confirm('Bạn có chắc muốn xóa mục này?')) return;
       appState[stateKey] = appState[stateKey].filter(x => x.id !== id);
       saveState();
-      renderActiveModule();
+      renderAccordionWorkspace();
       showToast('Đã xóa mục khỏi hệ thống');
     }
 
-    // -------------------- 8. UTILITIES --------------------
+    // -------------------- 11. UTILITIES --------------------
     function closeModal(id) {
       document.getElementById(id).classList.add('hidden');
     }
@@ -1398,13 +2140,13 @@
       appState = structuredClone(DEFAULT_DATA);
       saveState();
       renderLogo();
-      switchModule('zalo-dossier');
+      renderAccordionWorkspace();
       showToast('Đã khôi phục dữ liệu mẫu');
     }
 
     function updateStats() {
-      document.getElementById('statProducts').textContent = appState.products.length;
-      document.getElementById('statDocs').textContent = appState.zaloDossiers.length + appState.gdpForms.length + appState.legalPricing.length;
+      document.getElementById('statProducts').textContent = appState.zaloDossiers.length;
+      document.getElementById('statDocs').textContent = appState.gdpForms.length + appState.legalPricing.length;
       document.getElementById('statSlides').textContent = appState.trainingSlides.length;
     }
 
@@ -1429,7 +2171,10 @@
     renderLogo();
     updateStats();
     updateAdminUI();
-    switchModule(appState.activeModule || 'zalo-dossier');
+    renderAccordionWorkspace();
   </script>
 </body>
 </html>
+```
+
+---
