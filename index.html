@@ -33,17 +33,17 @@
 </head>
 <body class="bg-[#f4f7fb] dark:bg-slate-950 text-slate-800 dark:text-slate-100 antialiased min-h-screen flex flex-col transition-colors duration-200">
 
-  <!-- ==================== TOP HEADER & ADVANCED SEARCH ==================== -->
+  <!-- ==================== TOP HEADER ==================== -->
   <header class="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur border-b border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+    <div class="w-full px-3 sm:px-6 lg:px-9 py-3">
       <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3">
         
-        <!-- Logo (Kích thước lớn gấp đôi: 96x96px) & Brand SOHACO GROUP -->
+        <!-- Logo & Brand SOHACO GROUP -->
         <div class="flex items-center justify-between gap-3">
           <div class="flex items-center gap-3.5">
             <div class="relative group shrink-0">
-              <div id="logoPreviewContainer" class="w-24 h-24 rounded-2xl bg-gradient-to-br from-sky-700 to-teal-600 flex items-center justify-center text-white font-extrabold text-xl shadow-md overflow-hidden border border-slate-200 dark:border-slate-700 cursor-pointer" onclick="document.getElementById('logoUploadInput').click()" title="Nhấp để thay đổi hình ảnh Logo">
-                <img id="companyLogoImg" src="" alt="Logo SOHACO GROUP" class="hidden w-full h-full object-contain bg-white p-1" />
+              <div id="logoPreviewContainer" style="width: 96px; height: 96px;" class="rounded-2xl bg-gradient-to-br from-sky-700 to-teal-600 flex items-center justify-center text-white font-extrabold text-xl shadow-md overflow-hidden border border-slate-200 dark:border-slate-700 cursor-pointer transition-all" onclick="document.getElementById('logoUploadInput').click()" title="Nhấp để thay đổi hình ảnh Logo">
+                <img id="companyLogoImg" src="" alt="Logo SOHACO GROUP" class="hidden w-full h-full object-contain bg-white p-0.5" />
                 <span id="companyLogoFallback" class="brand-title text-lg">SHC</span>
               </div>
               <button onclick="document.getElementById('logoUploadInput').click()" class="absolute -bottom-1.5 -right-1.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-1.5 shadow hover:bg-sky-50 text-slate-600 dark:text-slate-200" title="Thay đổi hình ảnh Logo">
@@ -56,10 +56,15 @@
                 SOHACO GROUP
               </div>
               <p class="text-xs font-medium text-teal-700 dark:text-teal-400 mt-0.5">Vững bước tương lai</p>
+              <div id="adminLogoResizeBar" class="hidden mt-1.5 flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-lg border border-slate-200 dark:border-slate-700">
+                <span class="text-[10px] font-bold text-slate-600 dark:text-slate-300">Cỡ Logo:</span>
+                <input type="range" id="logoSizeSlider" min="64" max="200" step="4" value="96" oninput="previewLogoSize(this.value)" onchange="commitLogoSize(this.value)" class="w-20 accent-sky-600 cursor-pointer" />
+                <span id="logoSizeLabel" class="text-[10px] font-bold text-sky-700 dark:text-sky-400 w-9">96px</span>
+              </div>
             </div>
           </div>
 
-          <!-- Mobile Controls (Theme + Online + Chế độ) -->
+          <!-- Mobile Controls -->
           <div class="flex xl:hidden flex-wrap items-center justify-end gap-1.5">
             <button onclick="toggleUserTheme()" class="p-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-amber-300" title="Giao diện Sáng / Tối">
               <span class="theme-icon-slot text-xs font-bold">🌙</span>
@@ -74,7 +79,7 @@
           </div>
         </div>
 
-        <!-- Thanh tìm kiếm & Bảng tìm kiếm mở rộng giữ mở để tích chọn nhanh nhiều nhãn -->
+        <!-- Thanh tìm kiếm & Nút Bộ lọc mở ra giao diện riêng -->
         <div class="flex-1 max-w-2xl relative" id="searchWrapper">
           <div class="flex items-center bg-slate-100 dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/80 focus-within:bg-white dark:focus-within:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 focus-within:border-sky-500 rounded-xl overflow-hidden transition-all shadow-inner">
             <span class="pl-3 text-slate-400">
@@ -89,72 +94,33 @@
               class="w-full px-2.5 py-2.5 bg-transparent text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none"
             />
             <button id="clearSearchBtn" onclick="clearGlobalSearch()" class="hidden px-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200" title="Xóa tìm kiếm">✕</button>
-            <button onclick="toggleAdvancedSearchPanel()" id="advFilterToggleBtn" class="px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-sky-700 dark:hover:text-sky-400 border-l border-slate-200 dark:border-slate-700 flex items-center gap-1 shrink-0">
+            <button onclick="openAdvancedFilterModal()" class="px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-sky-700 dark:hover:text-sky-400 border-l border-slate-200 dark:border-slate-700 flex items-center gap-1 shrink-0">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
               <span>Bộ lọc</span>
               <span id="activeFilterCountBadge" class="hidden px-1.5 py-0.2 rounded-full bg-sky-600 text-white text-[10px]">0</span>
             </button>
-            <button onclick="triggerSearchButton()" class="bg-sky-700 hover:bg-sky-800 text-white px-4 py-2.5 text-sm font-semibold transition-colors flex items-center gap-1.5 shrink-0">
+            <button onclick="handleGlobalSearch()" class="bg-sky-700 hover:bg-sky-800 text-white px-4 py-2.5 text-sm font-semibold transition-colors flex items-center gap-1.5 shrink-0">
               <span>Tìm kiếm</span>
             </button>
           </div>
 
-          <!-- Bảng tìm kiếm mở rộng + Kết quả ngay bên dưới (giữ mở để tích chọn liên tục nhiều nhãn) -->
-          <div id="advancedSearchPanel" class="hidden absolute left-0 right-0 mt-2 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 z-50 overflow-hidden">
-            <div class="p-4 space-y-3 border-b border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40">
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-bold uppercase tracking-wider text-sky-800 dark:text-sky-400">Chọn nhanh các nhãn cần lọc (Tích liên tục, kết quả tự cập nhật bên dưới)</span>
-                <div class="flex items-center gap-3">
-                  <button onclick="resetSearchFilters()" class="text-xs text-rose-600 dark:text-rose-400 hover:underline font-semibold">Bỏ chọn hết</button>
-                  <button onclick="document.getElementById('advancedSearchPanel').classList.add('hidden')" class="text-xs text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 font-bold">Đóng ✕</button>
-                </div>
-              </div>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
-                <div class="bg-white dark:bg-slate-900 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700">
-                  <div class="font-bold text-slate-700 dark:text-slate-200 mb-1.5">Phân hệ nội dung:</div>
-                  <div class="flex flex-wrap gap-1.5" id="filterModuleLabels"></div>
-                </div>
-                <div class="bg-white dark:bg-slate-900 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700">
-                  <div class="font-bold text-slate-700 dark:text-slate-200 mb-1.5">Loại sản phẩm / Hồ sơ:</div>
-                  <div class="flex flex-wrap gap-1.5" id="filterProductTypeLabels"></div>
-                </div>
-                <div class="bg-white dark:bg-slate-900 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700">
-                  <div class="font-bold text-slate-700 dark:text-slate-200 mb-1.5">Tình trạng sản phẩm:</div>
-                  <div class="flex flex-wrap gap-1.5" id="filterStatusLabels"></div>
-                </div>
-                <div class="bg-white dark:bg-slate-900 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700">
-                  <div class="font-bold text-slate-700 dark:text-slate-200 mb-1.5">Kênh phân phối:</div>
-                  <div class="flex flex-wrap gap-1.5" id="filterChannelLabels"></div>
-                </div>
-              </div>
-            </div>
-            <!-- Kết quả cập nhật tức thì ngay dưới các nhãn tích chọn -->
-            <div class="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-xs font-semibold text-slate-600 dark:text-slate-300 flex items-center justify-between">
-              <span id="advResultsCountText">Kết quả theo bộ lọc</span>
-              <span class="text-[11px] text-sky-700 dark:text-sky-400">Nhấp vào mục bên dưới để mở ngay</span>
-            </div>
-            <div id="advResultsList" class="max-h-60 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800"></div>
-          </div>
-
-          <!-- Dropdown kết quả khi gõ từ khóa mà không mở bảng bộ lọc -->
-          <div id="searchResultsDropdown" class="hidden absolute left-0 right-0 mt-2 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 max-h-[65vh] overflow-y-auto z-50">
-            <div class="px-4 py-2.5 bg-slate-50 dark:bg-slate-800/80 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+          <div id="searchResultsDropdown" class="hidden absolute left-0 right-0 mt-2 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 max-h-[60vh] overflow-y-auto z-50">
+            <div class="px-4 py-2 bg-slate-50 dark:bg-slate-800/80 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
               <span id="searchCountText">Kết quả tìm kiếm</span>
-              <span class="text-[11px] bg-sky-50 dark:bg-sky-900/40 text-sky-700 dark:text-sky-300 px-2 py-0.5 rounded-full">Hỗ trợ ký tự rời rạc & không dấu</span>
+              <span class="text-[11px] bg-sky-50 dark:bg-sky-900/40 text-sky-700 dark:text-sky-300 px-2 py-0.5 rounded-full">Hỗ trợ ký tự rời rạc</span>
             </div>
             <div id="searchResultsList" class="divide-y divide-slate-100 dark:divide-slate-800"></div>
           </div>
         </div>
 
-        <!-- Desktop Controls: Theme Sáng/Tối | Số người online | Chế độ: Nhân viên -->
+        <!-- Desktop Controls: Theme | Số người online | Chế độ: Nhân viên -->
         <div class="hidden xl:flex items-center gap-2 shrink-0">
           <button onclick="toggleUserTheme()" id="themeToggleDesktop" class="px-3 py-2 rounded-xl text-xs font-semibold border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-amber-300 transition flex items-center gap-1.5" title="Tùy chọn giao diện riêng trên thiết bị của bạn">
             <span class="theme-icon-slot">🌙</span>
             <span class="theme-label-slot">Giao diện tối</span>
           </button>
 
-          <!-- Số người đang online nằm giữa nút Sáng/Tối và Chế độ -->
-          <div id="onlinePresenceBox" class="px-3 py-2 rounded-xl text-xs font-semibold border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5" title="Số người đang truy cập theo thời gian thực">
+          <div id="onlinePresenceBox" class="px-3 py-2 rounded-xl text-xs font-semibold border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5" title="Số người đang truy cập cùng lúc">
             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
             <span class="online-count-slot">Số người online: 1 người</span>
           </div>
@@ -168,12 +134,12 @@
     </div>
   </header>
 
-  <!-- ==================== HERO BANNER (TƯỜNG CHÍNH) ==================== -->
+  <!-- ==================== HERO BANNER ==================== -->
   <section class="bg-gradient-to-r from-sky-900 via-sky-800 to-teal-700 dark:from-slate-900 dark:via-sky-950 dark:to-teal-950 text-white relative overflow-hidden">
     <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 24px 24px;"></div>
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-7 sm:py-9 relative z-10">
+    <div class="w-full px-3 sm:px-6 lg:px-9 py-6 sm:py-8 relative z-10">
       <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-        <div class="max-w-3xl">
+        <div class="max-w-4xl">
           <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-sm text-sky-100 text-xs font-medium mb-3 border border-white/20">
             <svg class="w-3.5 h-3.5 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
             <span>Cổng làm việc số nội bộ</span>
@@ -186,17 +152,16 @@
           </p>
         </div>
 
-        <!-- Quick Stats -->
         <div class="grid grid-cols-3 gap-3 shrink-0">
-          <div class="bg-white/10 backdrop-blur border border-white/15 rounded-xl p-3 text-center">
+          <div class="bg-white/10 backdrop-blur border border-white/15 rounded-xl p-3 text-center min-w-[85px]">
             <div class="text-xl font-bold" id="statProducts">0</div>
             <div class="text-[11px] text-sky-100">Sản phẩm</div>
           </div>
-          <div class="bg-white/10 backdrop-blur border border-white/15 rounded-xl p-3 text-center">
+          <div class="bg-white/10 backdrop-blur border border-white/15 rounded-xl p-3 text-center min-w-[85px]">
             <div class="text-xl font-bold" id="statDocs">0</div>
             <div class="text-[11px] text-sky-100">GDP & Pháp lý</div>
           </div>
-          <div class="bg-white/10 backdrop-blur border border-white/15 rounded-xl p-3 text-center">
+          <div class="bg-white/10 backdrop-blur border border-white/15 rounded-xl p-3 text-center min-w-[85px]">
             <div class="text-xl font-bold" id="statSlides">0</div>
             <div class="text-[11px] text-sky-100">Slide đào tạo</div>
           </div>
@@ -205,33 +170,35 @@
     </div>
   </section>
 
-  <!-- ==================== HORIZONTAL TABS & WORKSPACE ==================== -->
-  <main class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1">
+  <!-- ==================== WORKSPACE (RỘNG CÁCH MÉP ~1CM) ==================== -->
+  <main class="w-full px-3 sm:px-6 lg:px-9 py-5 flex-1">
     <div class="mb-2.5 flex flex-wrap items-center justify-between gap-2">
-      <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Các phân hệ làm việc</h2>
+      <div class="flex items-center gap-3">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Các phân hệ làm việc</h2>
+        <span id="cloudSyncStatusBadge" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+          Lưu cục bộ trên thiết bị
+        </span>
+      </div>
       <div id="adminBannerBadge" class="hidden flex flex-wrap items-center gap-2">
         <span class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 border border-amber-300">
-          Đang đăng nhập quyền Quản trị (Admin)
+          Đang bật quyền Quản trị (Admin)
         </span>
+        <button onclick="openCloudConfigModal()" class="text-xs font-bold px-3 py-1 rounded-lg bg-sky-700 hover:bg-sky-800 text-white shadow-sm">
+          Cấu hình Đồng bộ Cloud & Drive
+        </button>
         <button onclick="openChangePasswordModal()" class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 text-slate-700 dark:text-slate-200">
           Đổi mật khẩu
-        </button>
-        <button onclick="configureRealtimePresence()" class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 text-slate-700 dark:text-slate-200">
-          Cấu hình đếm Online đa thiết bị
         </button>
       </div>
     </div>
 
-    <!-- Hàng ngang các tab: Tab đang mở sáng nổi bật, các tab kia tối đi -->
-    <div id="horizontalTabsBar" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5 mb-5"></div>
-
-    <!-- Khung hiển thị nội dung phân hệ đang mở -->
-    <div id="activeWorkspacePanel" class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-4 sm:p-6 min-h-[420px] transition-colors"></div>
+    <div id="horizontalTabsBar" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-5"></div>
+    <div id="activeWorkspacePanel" class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-3.5 sm:p-5 min-h-[420px] transition-colors"></div>
   </main>
 
   <!-- ==================== FOOTER ==================== -->
-  <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-4 mt-10 transition-colors">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400">
+  <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-4 mt-8 transition-colors">
+    <div class="w-full px-3 sm:px-6 lg:px-9 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400">
       <span>© 2026 Novem - Ds. Nguyễn Bá Huy</span>
       <div class="flex items-center gap-3">
         <button onclick="exportAllBackup()" class="hover:text-sky-700 dark:hover:text-sky-400 underline">Sao lưu dữ liệu (JSON)</button>
@@ -241,6 +208,86 @@
   </footer>
 
   <!-- ==================== MODALS ==================== -->
+
+  <!-- A. Bảng Lọc Mở Rộng Giao Diện Riêng -->
+  <div id="advancedFilterModal" class="hidden fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-4xl w-full h-[92vh] sm:h-[85vh] shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-700 flex flex-col">
+      <div class="bg-sky-900 text-white px-4 py-3.5 flex items-center justify-between gap-3 shrink-0">
+        <div>
+          <h3 class="font-bold text-sm sm:text-base">Tìm kiếm & Lọc nâng cao</h3>
+          <p class="text-[11px] text-sky-200">Tích chọn nhiều nhãn cùng lúc — kết quả tự cập nhật ngay bên dưới</p>
+        </div>
+        <button onclick="closeModal('advancedFilterModal')" class="px-2.5 py-1 rounded-lg bg-white/15 hover:bg-white/25 text-xs font-bold">Đóng ✕</button>
+      </div>
+
+      <div class="p-3 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 shrink-0 flex gap-2">
+        <input type="text" id="modalSearchInput" oninput="syncModalSearchInput(this.value)" placeholder="Nhập từ khóa tìm kiếm (không cần liền mạch)..." class="flex-1 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm focus:border-sky-500 focus:outline-none" />
+        <button onclick="resetSearchFilters()" class="px-3 py-2 rounded-xl text-xs font-bold bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-300 border border-rose-200 dark:border-rose-800 shrink-0">Xóa lọc</button>
+      </div>
+
+      <div class="p-3 sm:p-4 border-b border-slate-200 dark:border-slate-800 max-h-[38vh] overflow-y-auto shrink-0 space-y-2.5 text-xs bg-white dark:bg-slate-900">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div class="bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700">
+            <div class="font-bold text-slate-700 dark:text-slate-200 mb-1.5">Phân hệ nội dung:</div>
+            <div class="flex flex-wrap gap-1.5" id="filterModuleLabels"></div>
+          </div>
+          <div class="bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700">
+            <div class="font-bold text-slate-700 dark:text-slate-200 mb-1.5">Loại sản phẩm / Hồ sơ:</div>
+            <div class="flex flex-wrap gap-1.5" id="filterProductTypeLabels"></div>
+          </div>
+          <div class="bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700">
+            <div class="font-bold text-slate-700 dark:text-slate-200 mb-1.5">Tình trạng sản phẩm:</div>
+            <div class="flex flex-wrap gap-1.5" id="filterStatusLabels"></div>
+          </div>
+          <div class="bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700">
+            <div class="font-bold text-slate-700 dark:text-slate-200 mb-1.5">Kênh phân phối:</div>
+            <div class="flex flex-wrap gap-1.5" id="filterChannelLabels"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="px-4 py-2 bg-sky-50 dark:bg-sky-950/40 border-b border-sky-100 dark:border-slate-800 text-xs font-bold text-sky-900 dark:text-sky-300 flex items-center justify-between shrink-0">
+        <span id="advResultsCountText">Kết quả phù hợp</span>
+        <span class="text-[11px] font-normal">Chạm vào kết quả để mở ngay</span>
+      </div>
+      <div id="advResultsList" class="flex-1 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800"></div>
+    </div>
+  </div>
+
+  <!-- B. Modal Cấu hình Đồng bộ Cloud & Google Drive (Tích hợp sẵn nút Copy mã Apps Script) -->
+  <div id="cloudConfigModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-xl w-full shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-700 max-h-[90vh] flex flex-col">
+      <div class="bg-sky-900 text-white px-5 py-4 flex items-center justify-between">
+        <h3 class="font-bold text-base">Đồng bộ Đa thiết bị & Thư mục Google Drive</h3>
+        <button onclick="closeModal('cloudConfigModal')" class="text-white/80 hover:text-white text-xl leading-none">✕</button>
+      </div>
+      <div class="p-5 space-y-4 overflow-y-auto text-xs">
+        <div class="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-200 leading-relaxed space-y-2">
+          <div><strong>Hướng dẫn đồng bộ toàn bộ thiết bị & thư mục Drive (1vCF4O...):</strong></div>
+          <div>1. Bấm nút <strong>Copy mã Apps Script</strong> bên dưới $\rightarrow$ mở <a href="https://script.google.com" target="_blank" class="underline font-bold">script.google.com</a> tạo dự án mới và dán vào.</div>
+          <div>2. Chọn <strong>Deploy $\rightarrow$ New deployment $\rightarrow$ Web app</strong> (Execute as: <em>Me</em>, Who has access: <em>Anyone</em>) rồi dán URL nhận được vào ô số 1 bên dưới.</div>
+          <div>3. Sau khi có URL, dán thêm vào dòng <code>PRESET_CLOUD_SYNC_URL</code> trong file <code>index.html</code> trên GitHub để tất cả nhân viên vào link đều tự đồng bộ Logo, Sản phẩm và đếm đúng <strong>Số người online</strong>.</div>
+          <button type="button" onclick="copyBuiltInAppsScript()" class="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-bold">Copy mã Google Apps Script (đã gắn sẵn Drive 1vCF4...)</button>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 dark:text-slate-200 mb-1">1. URL Google Apps Script Web App:</label>
+          <input type="url" id="cfgCloudSyncUrl" placeholder="https://script.google.com/macros/s/.../exec" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-xs" />
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 dark:text-slate-200 mb-1">2. Hoặc URL Firebase Realtime Database (Tùy chọn đếm online thời gian thực):</label>
+          <input type="url" id="cfgFirebaseUrl" placeholder="https://ten-project-default-rtdb.firebaseio.com" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-xs" />
+        </div>
+
+        <div class="flex flex-wrap gap-2 pt-2">
+          <button onclick="saveCloudSettings()" class="px-4 py-2 rounded-xl font-bold bg-sky-700 hover:bg-sky-800 text-white">Lưu & Đồng bộ ngay</button>
+          <button onclick="pushStateToCloud(true)" class="px-4 py-2 rounded-xl font-bold bg-emerald-600 hover:bg-emerald-700 text-white">Đẩy dữ liệu máy này lên Cloud</button>
+          <button onclick="syncProductsFromGoogleDrive()" class="px-4 py-2 rounded-xl font-bold bg-amber-500 hover:bg-amber-600 text-white">Quét sản phẩm từ Drive (1vCF4...)</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- 1. Modal Đăng nhập Admin -->
   <div id="adminLoginModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
@@ -293,10 +340,9 @@
     </div>
   </div>
 
-  <!-- 3. Modal Thông tin gửi khách (Tích chọn từng file/thông tin + Chọn Gửi file trực tiếp hay Gửi đường link) -->
+  <!-- 3. Modal Thông tin gửi khách -->
   <div id="sendCustomerModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-xl w-full shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-700 max-h-[92vh] flex flex-col">
-      <!-- Header với Logo Sohaco ở góc trái -->
       <div class="bg-gradient-to-r from-sky-800 to-teal-700 text-white px-5 py-3.5 flex items-center justify-between shrink-0">
         <div class="flex items-center gap-3">
           <div class="w-14 h-14 rounded-xl bg-white flex items-center justify-center overflow-hidden border border-white/30 shadow-sm shrink-0">
@@ -312,7 +358,6 @@
       </div>
 
       <div class="p-5 space-y-4 overflow-y-auto">
-        <!-- Phần tích chọn nội dung/hồ sơ cụ thể (hiện khi gửi sản phẩm) -->
         <div id="sendChecklistSection" class="hidden space-y-3 bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700">
           <div class="flex items-center justify-between">
             <span class="text-xs font-bold uppercase text-slate-700 dark:text-slate-200">1. Chọn hồ sơ & thông tin cần gửi:</span>
@@ -329,7 +374,6 @@
 
           <div id="dossierFilesChecklist" class="space-y-1.5 max-h-40 overflow-y-auto pr-1"></div>
 
-          <!-- Chọn hình thức: Gửi file trực tiếp hay Gửi đường link -->
           <div class="pt-2 border-t border-slate-200 dark:border-slate-700">
             <div class="text-xs font-bold uppercase text-slate-700 dark:text-slate-200 mb-2">2. Hình thức chia sẻ tới khách hàng:</div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -337,14 +381,14 @@
                 <input type="radio" name="sendModeRadio" value="direct_file" checked onchange="onSendModeChange(this.value)" class="mt-0.5 accent-blue-600" />
                 <div>
                   <div class="text-xs font-bold text-slate-900 dark:text-white">Gửi file trực tiếp qua ứng dụng</div>
-                  <div class="text-[11px] text-slate-500 dark:text-slate-400">Tải/chia sẻ thẳng tệp cho khách trong danh bạ, không gửi kèm đường link.</div>
+                  <div class="text-[11px] text-slate-500 dark:text-slate-400">Chia sẻ tệp trực tiếp tới khách trong danh bạ, không gửi kèm đường link.</div>
                 </div>
               </label>
               <label class="flex items-start gap-2 p-2.5 rounded-xl border cursor-pointer transition bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700">
                 <input type="radio" name="sendModeRadio" value="link_share" onchange="onSendModeChange(this.value)" class="mt-0.5 accent-blue-600" />
                 <div>
                   <div class="text-xs font-bold text-slate-900 dark:text-white">Gửi đường link lấy hồ sơ</div>
-                  <div class="text-[11px] text-slate-500 dark:text-slate-400">Kèm link Google Drive để khách hàng chủ động mở và tải hồ sơ.</div>
+                  <div class="text-[11px] text-slate-500 dark:text-slate-400">Kèm link Google Drive để khách hàng tự mở và tải hồ sơ.</div>
                 </div>
               </label>
             </div>
@@ -356,10 +400,9 @@
           <textarea id="customerShareText" rows="6" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 p-3 text-sm bg-slate-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-900 focus:border-sky-500 focus:outline-none leading-relaxed"></textarea>
         </div>
 
-        <!-- Lựa chọn ứng dụng trên máy tính -->
         <div id="desktopShareOptions" class="hidden bg-sky-50 dark:bg-sky-950/50 border border-sky-200 dark:border-sky-800 rounded-xl p-3.5 space-y-2.5">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-sky-900 dark:text-sky-200" id="desktopShareHintTitle">Chọn ứng dụng để gửi (Nội dung đã sao chép sẵn):</span>
+            <span class="text-xs font-bold text-sky-900 dark:text-sky-200">Chọn ứng dụng để gửi (Nội dung đã sao chép sẵn):</span>
             <button onclick="document.getElementById('desktopShareOptions').classList.add('hidden')" class="text-xs text-slate-400 hover:text-slate-600">Ẩn</button>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -384,7 +427,7 @@
     </div>
   </div>
 
-  <!-- 4. Modal Chi tiết Sản phẩm (Hiển thị đầy đủ các thông tin ẩn khỏi bảng chính) -->
+  <!-- 4. Modal Chi tiết Sản phẩm -->
   <div id="productDetailModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-2xl w-full shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-700 max-h-[90vh] flex flex-col">
       <div class="bg-sky-800 text-white px-5 py-4 flex items-center justify-between">
@@ -414,10 +457,8 @@
     </div>
   </div>
 
-  <!-- Input ẩn upload file Excel/CSV -->
   <input type="file" id="catalogExcelUploadInput" accept=".xlsx,.xls,.csv" class="hidden" onchange="handleCatalogExcelUpload(event)" />
 
-  <!-- Toast Notification -->
   <div id="toast" class="hidden fixed bottom-5 right-5 z-50 bg-slate-900 dark:bg-slate-800 text-white px-4 py-3 rounded-xl shadow-xl text-xs font-semibold flex items-center gap-2 border border-slate-700">
     <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
     <span id="toastMessage">Thao tác thành công</span>
@@ -425,9 +466,13 @@
 
   <!-- ==================== JAVASCRIPT LOGIC ==================== -->
   <script>
-    const STORAGE_KEY = 'sohaco_workspace_v6';
+    const PRESET_CLOUD_SYNC_URL = '';
+    const PRESET_FIREBASE_URL = '';
+
+    const STORAGE_KEY = 'sohaco_workspace_v7';
     const THEME_PREF_KEY = 'sohaco_user_theme_pref';
-    const PRESENCE_KEY = 'sohaco_online_tabs_v1';
+    const PRESENCE_KEY = 'sohaco_online_tabs_v2';
+    const DRIVE_FOLDER_URL = 'https://drive.google.com/drive/folders/1vCF4OLGw3jjWKScmNUF0Ym1Ungafat4e';
     const DAV_LOOKUP_URL = 'https://dichvucong.dav.gov.vn/congbothuoc/index';
 
     const PRODUCT_TYPES = ['Thuốc', 'Thực phẩm chức năng', 'Mỹ phẩm', 'Thiết bị y tế'];
@@ -480,14 +525,17 @@
 
     const DEFAULT_DATA = {
       logoDataUrl: '',
+      logoSizePx: 96,
       activeTab: 'product-catalog',
       activeProductTypeFilter: 'ALL',
       activeGroupFilter: 'ALL',
       activeStatusFilter: 'ALL',
       adminAuth: { username: 'admin', passwordHash: 'Sohaco@2026' },
-      firebasePresenceUrl: '',
+      cloudSyncUrl: PRESET_CLOUD_SYNC_URL,
+      firebasePresenceUrl: PRESET_FIREBASE_URL,
       googleSheetUrl: 'https://docs.google.com/spreadsheets/',
       googleAppsScriptUrl: '',
+      lastUpdatedTs: 0,
       products: [
         {
           id: 'sp1',
@@ -496,11 +544,14 @@
           code: 'SHC-KS01',
           name: 'Sohaco-Cefixim 200mg',
           ingredient: 'Cefixim 200mg',
+          imageUrl: '',
+          imageSizePx: 52,
+          imageFit: 'contain',
           usageRoute: 'Đường uống',
-          boxSpec: 'Hộp 2 vỉ x 10 viên nén bao phim',
+          boxSpec: 'Hộp 2 vỉ x 10 viên nén',
           cartonSpec: 'Thùng 100 hộp',
           priceExclVat: 85714,
-          vatAmount: 4286,
+          vatRate: 5,
           regNumber: 'VD-31245-24',
           regDate: '2029-12-31',
           atcCode: 'J01DD08',
@@ -508,16 +559,15 @@
           channels: ['Nhà thuốc', 'Quầy thuốc'],
           status: 'Đang kinh doanh',
           statusUpdatedAt: '08:30:15 18/11/2026',
-          fileUrl: 'https://drive.google.com/drive/folders/sample-cefixim-200',
+          fileUrl: DRIVE_FOLDER_URL,
           driveUpdatedAt: '2026-11-16',
           dossierFiles: [
-            { id: 'f1', label: 'Giấy đăng ký lưu hành thuốc (SĐK)', url: 'https://drive.google.com/file/d/sample-sdk-cefixim/view' },
-            { id: 'f2', label: 'Phiếu kiểm nghiệm lô mới nhất (COA)', url: 'https://drive.google.com/file/d/sample-coa-cefixim/view' },
-            { id: 'f3', label: 'Tờ hướng dẫn sử dụng (HDSD)', url: 'https://drive.google.com/file/d/sample-hdsd-cefixim/view' }
+            { id: 'f1', label: 'Giấy đăng ký lưu hành thuốc (SĐK)', url: DRIVE_FOLDER_URL },
+            { id: 'f2', label: 'Phiếu kiểm nghiệm lô mới nhất (COA)', url: DRIVE_FOLDER_URL },
+            { id: 'f3', label: 'Tờ hướng dẫn sử dụng (HDSD)', url: DRIVE_FOLDER_URL }
           ],
           prescriptionType: 'Thuốc kê đơn',
           essentialType: 'Thuốc thiết yếu',
-          manufacturer: 'Nhà máy Sohaco / GMP-WHO',
           davUrl: DAV_LOOKUP_URL
         },
         {
@@ -527,11 +577,14 @@
           code: 'SHC-GD02',
           name: 'Sohaco-Paracetamol 500mg Extra',
           ingredient: 'Paracetamol 500mg + Cafein 65mg',
+          imageUrl: '',
+          imageSizePx: 52,
+          imageFit: 'contain',
           usageRoute: 'Đường uống',
           boxSpec: 'Hộp 10 vỉ x 10 viên nén',
           cartonSpec: 'Thùng 60 hộp',
           priceExclVat: 42857,
-          vatAmount: 2143,
+          vatRate: 5,
           regNumber: 'VD-29811-23',
           regDate: '2028-08-20',
           atcCode: 'N02BE51',
@@ -539,15 +592,14 @@
           channels: ['Nhà thuốc', 'Quầy thuốc', 'General Trade'],
           status: 'Đang kinh doanh',
           statusUpdatedAt: '09:15:40 18/11/2026',
-          fileUrl: 'https://drive.google.com/drive/folders/sample-para-500',
+          fileUrl: DRIVE_FOLDER_URL,
           driveUpdatedAt: '2026-11-12',
           dossierFiles: [
-            { id: 'f4', label: 'Tờ hướng dẫn sử dụng (HDSD)', url: 'https://drive.google.com/file/d/sample-hdsd-para/view' },
-            { id: 'f5', label: 'Phiếu kiểm nghiệm (COA)', url: 'https://drive.google.com/file/d/sample-coa-para/view' }
+            { id: 'f4', label: 'Tờ hướng dẫn sử dụng (HDSD)', url: DRIVE_FOLDER_URL },
+            { id: 'f5', label: 'Phiếu kiểm nghiệm (COA)', url: DRIVE_FOLDER_URL }
           ],
           prescriptionType: 'Thuốc không kê đơn',
           essentialType: 'Thuốc thiết yếu',
-          manufacturer: 'Nhà máy Sohaco / GMP-WHO',
           davUrl: DAV_LOOKUP_URL
         },
         {
@@ -557,11 +609,14 @@
           code: 'SHC-TP08',
           name: 'Sohaco-Liver Detox (Silymarin 140mg)',
           ingredient: 'Silymarin 140mg + Vitamin nhóm B',
+          imageUrl: '',
+          imageSizePx: 52,
+          imageFit: 'contain',
           usageRoute: 'Đường uống',
           boxSpec: 'Hộp 1 lọ x 60 viên nang mềm',
           cartonSpec: 'Thùng 48 hộp',
           priceExclVat: 203704,
-          vatAmount: 16296,
+          vatRate: 8,
           regNumber: '4512/2025/ĐKSP',
           regDate: '',
           atcCode: '',
@@ -569,15 +624,11 @@
           channels: ['Nhà thuốc', 'Quầy thuốc', 'Modern trade'],
           status: 'Đang kinh doanh',
           statusUpdatedAt: '10:05:00 17/11/2026',
-          fileUrl: 'https://drive.google.com/drive/folders/sample-liver-detox',
+          fileUrl: DRIVE_FOLDER_URL,
           driveUpdatedAt: '2026-11-14',
-          dossierFiles: [
-            { id: 'f6', label: 'Giấy tiếp nhận đăng ký công bố sản phẩm (ĐKSP)', url: 'https://drive.google.com/file/d/sample-dksp-liver/view' },
-            { id: 'f7', label: 'Giấy xác nhận nội dung quảng cáo', url: 'https://drive.google.com/file/d/sample-qc-liver/view' }
-          ],
+          dossierFiles: [{ id: 'f6', label: 'Giấy tiếp nhận ĐKSP', url: DRIVE_FOLDER_URL }],
           priceDeclStatus: 'Kê khai giá',
           ageGroup: 'Từ 6 tuổi trở lên',
-          manufacturer: 'Nhà máy đạt chuẩn GMP',
           davUrl: ''
         },
         {
@@ -587,11 +638,14 @@
           code: 'SHC-TP12',
           name: 'Sohaco Baby D3K2 Drops',
           ingredient: 'Vitamin D3 400IU + Vitamin K2 MK7',
+          imageUrl: '',
+          imageSizePx: 52,
+          imageFit: 'contain',
           usageRoute: 'Đường uống (nhỏ giọt)',
           boxSpec: 'Hộp 1 lọ 15ml',
           cartonSpec: 'Thùng 80 hộp',
           priceExclVat: 171296,
-          vatAmount: 13704,
+          vatRate: 8,
           regNumber: '6208/2026/ĐKSP',
           regDate: '',
           atcCode: '',
@@ -599,14 +653,11 @@
           channels: ['Nhà thuốc', 'Modern trade', 'General Trade'],
           status: 'Tạm ngưng',
           statusUpdatedAt: '14:20:10 15/11/2026',
-          fileUrl: 'https://drive.google.com/drive/folders/sample-baby-d3k2',
+          fileUrl: DRIVE_FOLDER_URL,
           driveUpdatedAt: '2026-11-15',
-          dossierFiles: [
-            { id: 'f8', label: 'Bản công bố ĐKSP', url: 'https://drive.google.com/file/d/sample-dksp-d3k2/view' }
-          ],
+          dossierFiles: [{ id: 'f8', label: 'Bản công bố ĐKSP', url: DRIVE_FOLDER_URL }],
           priceDeclStatus: 'Không kê khai giá',
           ageGroup: 'Từ 0 tuổi trở lên',
-          manufacturer: 'Nhà máy đạt chuẩn GMP',
           davUrl: ''
         },
         {
@@ -616,11 +667,14 @@
           code: 'SHC-MP03',
           name: 'Sohaco Derma Care Gel 30g',
           ingredient: 'Panthenol 5% + Chiết xuất rau má',
+          imageUrl: '',
+          imageSizePx: 52,
+          imageFit: 'contain',
           usageRoute: 'Bôi ngoài da',
           boxSpec: 'Hộp 1 tuýp 30g',
           cartonSpec: 'Thùng 120 hộp',
           priceExclVat: 104545,
-          vatAmount: 10455,
+          vatRate: 10,
           regNumber: '1842/25/CBMP-HN',
           regDate: '2030-03-10',
           atcCode: '',
@@ -628,12 +682,9 @@
           channels: ['Nhà thuốc', 'Modern trade', 'General Trade'],
           status: 'Đang kinh doanh',
           statusUpdatedAt: '11:45:22 16/11/2026',
-          fileUrl: 'https://drive.google.com/drive/folders/sample-derma-care',
+          fileUrl: DRIVE_FOLDER_URL,
           driveUpdatedAt: '2026-11-10',
-          dossierFiles: [
-            { id: 'f9', label: 'Phiếu công bố sản phẩm mỹ phẩm', url: 'https://drive.google.com/file/d/sample-cbmp-derma/view' }
-          ],
-          manufacturer: 'Nhà máy CGMP',
+          dossierFiles: [{ id: 'f9', label: 'Phiếu công bố sản phẩm mỹ phẩm', url: DRIVE_FOLDER_URL }],
           davUrl: ''
         },
         {
@@ -643,11 +694,14 @@
           code: 'SHC-TB01',
           name: 'Dung dịch xịt mũi ưu trương Sohaco Saline',
           ingredient: 'NaCl 1.9% vô khuẩn',
+          imageUrl: '',
+          imageSizePx: 52,
+          imageFit: 'contain',
           usageRoute: 'Xịt mũi',
           boxSpec: 'Hộp 1 chai 70ml',
           cartonSpec: 'Thùng 60 hộp',
           priceExclVat: 80952,
-          vatAmount: 4048,
+          vatRate: 5,
           regNumber: '2500112/PCBA-HN',
           regDate: '2025-10-18',
           atcCode: '',
@@ -655,13 +709,10 @@
           channels: ['Nhà thuốc', 'Quầy thuốc', 'Modern trade'],
           status: 'Ngưng kinh doanh',
           statusUpdatedAt: '16:10:05 10/11/2026',
-          fileUrl: 'https://drive.google.com/drive/folders/sample-tbyt-saline',
+          fileUrl: DRIVE_FOLDER_URL,
           driveUpdatedAt: '2026-11-15',
-          dossierFiles: [
-            { id: 'f10', label: 'Bản phân loại TTBYT Loại A & Hồ sơ công bố', url: 'https://drive.google.com/file/d/sample-tbyt-saline/view' }
-          ],
+          dossierFiles: [{ id: 'f10', label: 'Hồ sơ phân loại & công bố TTBYT', url: DRIVE_FOLDER_URL }],
           deviceClass: 'Loại A',
-          manufacturer: 'ISO 13485',
           davUrl: ''
         }
       ],
@@ -715,15 +766,6 @@
           effectiveDate: '15/09/2026',
           department: 'Giao nhận & Sale',
           fileUrl: 'https://docs.google.com/document/'
-        },
-        {
-          id: 'gdp3',
-          code: 'BM-GDP-12',
-          title: 'Biểu mẫu tiếp nhận khiếu nại chất lượng & thu hồi sản phẩm',
-          version: 'Phiên bản 2.1',
-          effectiveDate: '20/08/2026',
-          department: 'QA/QC',
-          fileUrl: 'https://docs.google.com/document/'
         }
       ],
       legalPricing: [
@@ -735,7 +777,7 @@
           authority: 'Cục Quản lý Dược - Bộ Y tế',
           declaredPrice: '4.500 VNĐ/viên (90.000 VNĐ/hộp)',
           effectiveDate: '01/11/2026',
-          fileUrl: 'https://drive.google.com/file/d/sample-kkg/view'
+          fileUrl: DRIVE_FOLDER_URL
         },
         {
           id: 'lp2',
@@ -745,17 +787,7 @@
           authority: 'Sở Y tế Hà Nội',
           declaredPrice: 'Còn hiệu lực đến 12/2028',
           effectiveDate: '15/12/2025',
-          fileUrl: 'https://drive.google.com/file/d/sample-gdp-cert/view'
-        },
-        {
-          id: 'lp3',
-          code: 'DDKKDD-SHC',
-          title: 'Giấy chứng nhận đủ điều kiện kinh doanh Dược (ĐĐKKDD)',
-          category: 'Hồ sơ pháp lý công ty',
-          authority: 'Bộ Y tế / Sở Y tế',
-          declaredPrice: 'Bản sao công chứng PDF',
-          effectiveDate: '10/05/2024',
-          fileUrl: 'https://drive.google.com/file/d/sample-ddkkdd/view'
+          fileUrl: DRIVE_FOLDER_URL
         }
       ],
       feedbacks: [
@@ -776,33 +808,21 @@
     let selectedLegalIds = new Set();
     let activeHighlightId = null;
 
-    // Context cho modal gửi khách
-    let currentSendContext = {
-      type: 'custom', // 'products' | 'custom'
-      items: [],
-      files: [], // { productId, productName, label, url, localDataUrl, localFileName }
-      sendMode: 'direct_file'
-    };
-
-    const searchFilters = {
-      modules: new Set(),
-      productTypes: new Set(),
-      statuses: new Set(),
-      channels: new Set()
-    };
+    let currentSendContext = { type: 'custom', items: [], files: [], checkedUids: new Set(), sendMode: 'direct_file' };
+    const searchFilters = { modules: new Set(), productTypes: new Set(), statuses: new Set(), channels: new Set() };
 
     function loadState() {
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
         if (!raw) {
           const base = structuredClone(DEFAULT_DATA);
-          for (const oldKey of ['sohaco_workspace_v5', 'sohaco_workspace_v4', 'sohaco_workspace_v3', 'sohaco_workspace_v2', 'sohaco_workspace_v1']) {
+          for (const oldKey of ['sohaco_workspace_v6', 'sohaco_workspace_v5', 'sohaco_workspace_v4']) {
             const oldRaw = localStorage.getItem(oldKey);
             if (oldRaw) {
               const oldParsed = JSON.parse(oldRaw);
               if (oldParsed.logoDataUrl) base.logoDataUrl = oldParsed.logoDataUrl;
-              if (oldParsed.googleSheetUrl) base.googleSheetUrl = oldParsed.googleSheetUrl;
-              if (oldParsed.googleAppsScriptUrl) base.googleAppsScriptUrl = oldParsed.googleAppsScriptUrl;
+              if (oldParsed.cloudSyncUrl) base.cloudSyncUrl = oldParsed.cloudSyncUrl;
+              if (oldParsed.firebasePresenceUrl) base.firebasePresenceUrl = oldParsed.firebasePresenceUrl;
               break;
             }
           }
@@ -819,18 +839,103 @@
       }
     }
 
-    function saveState() {
+    function saveState(pushCloud = false) {
+      appState.lastUpdatedTs = Date.now();
       localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
       updateStats();
+      updateSyncBadge();
+      if (pushCloud && isAdminMode) pushStateToCloud(false);
     }
 
     function structuredClone(obj) {
       return JSON.parse(JSON.stringify(obj));
     }
 
-    // -------------------- 2. REAL-TIME ONLINE PRESENCE --------------------
-    const SESSION_TAB_ID = 'tab_' + Math.random().toString(36).slice(2) + '_' + Date.now();
-    let presenceChannel = null;
+    // -------------------- 2. CLOUD SYNC & REAL ONLINE PRESENCE --------------------
+    const SESSION_TAB_ID = 'u_' + Math.random().toString(36).slice(2, 10) + '_' + Date.now();
+
+    function copyBuiltInAppsScript() {
+      const code = [
+        "const DRIVE_FOLDER_ID = '1vCF4OLGw3jjWKScmNUF0Ym1Ungafat4e';",
+        "",
+        "function getOrCreateSheet(name) {",
+        "  var props = PropertiesService.getScriptProperties();",
+        "  var ssId = props.getProperty('SS_ID');",
+        "  var ss = ssId ? SpreadsheetApp.openById(ssId) : SpreadsheetApp.create('Sohaco_Workspace_Database');",
+        "  if (!ssId) props.setProperty('SS_ID', ss.getId());",
+        "  var sheet = ss.getSheetByName(name) || ss.insertSheet(name);",
+        "  return sheet;",
+        "}",
+        "",
+        "function doGet(e) {",
+        "  var action = (e && e.parameter && e.parameter.action) || '';",
+        "  if (action === 'ping') {",
+        "    var uid = e.parameter.uid || ('u_' + Date.now());",
+        "    var cache = CacheService.getScriptCache();",
+        "    var listRaw = cache.get('ONLINE_USERS');",
+        "    var map = listRaw ? JSON.parse(listRaw) : {};",
+        "    var now = Date.now();",
+        "    map[uid] = now;",
+        "    var active = {};",
+        "    var count = 0;",
+        "    Object.keys(map).forEach(function(k) {",
+        "      if (now - map[k] <= 25000) { active[k] = map[k]; count++; }",
+        "    });",
+        "    cache.put('ONLINE_USERS', JSON.stringify(active), 60);",
+        "    return ContentService.createTextOutput(JSON.stringify({ online: count })).setMimeType(ContentService.MimeType.JSON);",
+        "  }",
+        "  if (action === 'getState') {",
+        "    var sheet = getOrCreateSheet('State');",
+        "    var raw = sheet.getRange('A1').getValue();",
+        "    return ContentService.createTextOutput(JSON.stringify({ state: raw ? JSON.parse(raw) : null })).setMimeType(ContentService.MimeType.JSON);",
+        "  }",
+        "  if (action === 'scanDrive') {",
+        "    var root = DriveApp.getFolderById(DRIVE_FOLDER_ID);",
+        "    var items = [];",
+        "    var subFolders = root.getFolders();",
+        "    while (subFolders.hasNext()) {",
+        "      var sf = subFolders.next();",
+        "      var filesArr = [];",
+        "      var sfFiles = sf.getFiles();",
+        "      while (sfFiles.hasNext()) {",
+        "        var ff = sfFiles.next();",
+        "        filesArr.push({ id: ff.getId(), label: ff.getName(), url: ff.getUrl() });",
+        "      }",
+        "      items.push({ name: sf.getName(), url: sf.getUrl(), updatedAt: sf.getLastUpdated().toISOString(), files: filesArr });",
+        "    }",
+        "    var rootFiles = root.getFiles();",
+        "    while (rootFiles.hasNext()) {",
+        "      var rf = rootFiles.next();",
+        "      items.push({ name: rf.getName(), url: rf.getUrl(), updatedAt: rf.getLastUpdated().toISOString(), files: [{ id: rf.getId(), label: rf.getName(), url: rf.getUrl() }] });",
+        "    }",
+        "    return ContentService.createTextOutput(JSON.stringify({ items: items })).setMimeType(ContentService.MimeType.JSON);",
+        "  }",
+        "  return ContentService.createTextOutput('OK');",
+        "}",
+        "",
+        "function doPost(e) {",
+        "  var body = JSON.parse(e.postData.contents);",
+        "  if (body.action === 'saveState' && body.state) {",
+        "    var sheet = getOrCreateSheet('State');",
+        "    sheet.getRange('A1').setValue(JSON.stringify(body.state));",
+        "  }",
+        "  return ContentService.createTextOutput(JSON.stringify({ ok: true })).setMimeType(ContentService.MimeType.JSON);",
+        "}"
+      ].join("\n");
+      navigator.clipboard.writeText(code).then(() => showToast('Đã copy mã Google Apps Script vào bộ nhớ tạm!'));
+    }
+
+    function updateSyncBadge() {
+      const el = document.getElementById('cloudSyncStatusBadge');
+      if (!el) return;
+      if (appState.cloudSyncUrl || appState.firebasePresenceUrl) {
+        el.textContent = 'Đã kết nối Đồng bộ Đa thiết bị (Cloud)';
+        el.className = 'text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800';
+      } else {
+        el.textContent = 'Lưu cục bộ (Chưa nối Cloud đa thiết bị)';
+        el.className = 'text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300';
+      }
+    }
 
     function updateOnlineCountUI(count) {
       const n = Math.max(1, Number(count) || 1);
@@ -839,102 +944,320 @@
       });
     }
 
-    function tickLocalPresence() {
+    function getSharedCloudPayload() {
+      return {
+        logoDataUrl: appState.logoDataUrl,
+        logoSizePx: appState.logoSizePx,
+        products: appState.products,
+        trainingSlides: appState.trainingSlides,
+        gdpForms: appState.gdpForms,
+        legalPricing: appState.legalPricing,
+        feedbacks: appState.feedbacks,
+        lastUpdatedTs: appState.lastUpdatedTs || Date.now()
+      };
+    }
+
+    function applyCloudPayload(cloudData) {
+      if (!cloudData || typeof cloudData !== 'object') return false;
+      let changed = false;
+      if (typeof cloudData.logoDataUrl === 'string') { appState.logoDataUrl = cloudData.logoDataUrl; changed = true; }
+      if (cloudData.logoSizePx) { appState.logoSizePx = Number(cloudData.logoSizePx) || 96; changed = true; }
+      if (Array.isArray(cloudData.products)) { appState.products = cloudData.products; changed = true; }
+      if (Array.isArray(cloudData.trainingSlides)) { appState.trainingSlides = cloudData.trainingSlides; changed = true; }
+      if (Array.isArray(cloudData.gdpForms)) { appState.gdpForms = cloudData.gdpForms; changed = true; }
+      if (Array.isArray(cloudData.legalPricing)) { appState.legalPricing = cloudData.legalPricing; changed = true; }
+      if (Array.isArray(cloudData.feedbacks)) { appState.feedbacks = cloudData.feedbacks; changed = true; }
+
+      if (changed) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+        renderLogo();
+        updateStats();
+        renderTabsAndWorkspace();
+      }
+      return changed;
+    }
+
+    async function pullStateFromCloud() {
+      if (appState.firebasePresenceUrl) {
+        try {
+          const baseUrl = appState.firebasePresenceUrl.replace(/\/$/, '');
+          const res = await fetch(`${baseUrl}/sohaco_shared_state.json`);
+          const data = await res.json();
+          if (data && (!appState.lastUpdatedTs || (data.lastUpdatedTs || 0) > appState.lastUpdatedTs)) {
+            applyCloudPayload(data);
+          }
+        } catch (e) {}
+      } else if (appState.cloudSyncUrl) {
+        try {
+          const res = await fetch(`${appState.cloudSyncUrl}?action=getState&t=${Date.now()}`);
+          const data = await res.json();
+          if (data && data.state) applyCloudPayload(data.state);
+        } catch (e) {}
+      }
+    }
+
+    async function pushStateToCloud(showMessage = true) {
+      const payload = getSharedCloudPayload();
+      let ok = false;
+
+      if (appState.firebasePresenceUrl) {
+        try {
+          const baseUrl = appState.firebasePresenceUrl.replace(/\/$/, '');
+          const res = await fetch(`${baseUrl}/sohaco_shared_state.json`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          if (res.ok) ok = true;
+        } catch (e) {}
+      }
+
+      if (appState.cloudSyncUrl) {
+        try {
+          await fetch(appState.cloudSyncUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: 'saveState', state: payload })
+          });
+          ok = true;
+        } catch (e) {}
+      }
+
+      if (showMessage) {
+        if (ok) showToast('Đã đồng bộ Logo & dữ liệu lên Cloud cho tất cả thiết bị!');
+        else alert('Chưa có URL Đồng bộ Cloud hợp lệ. Vui lòng nhập URL Google Apps Script hoặc Firebase trước.');
+      }
+    }
+
+    async function tickCloudOrLocalPresence() {
+      if (appState.firebasePresenceUrl) {
+        try {
+          const baseUrl = appState.firebasePresenceUrl.replace(/\/$/, '');
+          await fetch(`${baseUrl}/sohaco_online/${SESSION_TAB_ID}.json`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ lastSeen: Date.now() })
+          });
+          const res = await fetch(`${baseUrl}/sohaco_online.json`);
+          const data = await res.json();
+          const now = Date.now();
+          let count = 0;
+          if (data && typeof data === 'object') {
+            for (const v of Object.values(data)) {
+              if (v && now - (v.lastSeen || 0) <= 25000) count++;
+            }
+          }
+          updateOnlineCountUI(count || 1);
+          return;
+        } catch (e) {}
+      }
+
+      if (appState.cloudSyncUrl) {
+        try {
+          const res = await fetch(`${appState.cloudSyncUrl}?action=ping&uid=${encodeURIComponent(SESSION_TAB_ID)}&t=${Date.now()}`);
+          const data = await res.json();
+          if (data && typeof data.online === 'number') {
+            updateOnlineCountUI(data.online);
+            return;
+          }
+        } catch (e) {}
+      }
+
       try {
         const now = Date.now();
-        const raw = localStorage.getItem(PRESENCE_KEY);
-        const map = raw ? JSON.parse(raw) : {};
+        const map = JSON.parse(localStorage.getItem(PRESENCE_KEY) || '{}');
         map[SESSION_TAB_ID] = now;
         for (const k of Object.keys(map)) {
           if (now - map[k] > 15000) delete map[k];
         }
         localStorage.setItem(PRESENCE_KEY, JSON.stringify(map));
-        if (!appState.firebasePresenceUrl) {
-          updateOnlineCountUI(Object.keys(map).length);
-        }
+        updateOnlineCountUI(Object.keys(map).length);
       } catch (e) {
         updateOnlineCountUI(1);
       }
     }
 
-    async function tickFirebasePresence() {
-      const baseUrl = (appState.firebasePresenceUrl || '').replace(/\/$/, '');
-      if (!baseUrl) return;
-      try {
-        await fetch(`${baseUrl}/sohaco_online/${SESSION_TAB_ID}.json`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ lastSeen: Date.now() })
-        });
-        const res = await fetch(`${baseUrl}/sohaco_online.json`);
-        const data = await res.json();
-        const now = Date.now();
-        let activeCount = 0;
-        if (data && typeof data === 'object') {
-          for (const [k, v] of Object.entries(data)) {
-            if (v && now - (v.lastSeen || 0) <= 30000) activeCount++;
-          }
-        }
-        updateOnlineCountUI(activeCount || 1);
-      } catch (e) {
-        tickLocalPresence();
-      }
-    }
+    function initOnlineAndCloudSync() {
+      tickCloudOrLocalPresence();
+      pullStateFromCloud();
 
-    function initOnlinePresence() {
-      tickLocalPresence();
       if (window.BroadcastChannel) {
-        presenceChannel = new BroadcastChannel('sohaco_online_presence');
-        presenceChannel.onmessage = () => tickLocalPresence();
-        presenceChannel.postMessage({ type: 'ping' });
+        const ch = new BroadcastChannel('sohaco_online_presence');
+        ch.onmessage = () => tickCloudOrLocalPresence();
+        ch.postMessage({ type: 'ping' });
       }
       window.addEventListener('storage', (e) => {
-        if (e.key === PRESENCE_KEY) tickLocalPresence();
+        if (e.key === PRESENCE_KEY) tickCloudOrLocalPresence();
       });
       window.addEventListener('beforeunload', () => {
         try {
           const map = JSON.parse(localStorage.getItem(PRESENCE_KEY) || '{}');
           delete map[SESSION_TAB_ID];
           localStorage.setItem(PRESENCE_KEY, JSON.stringify(map));
-          if (presenceChannel) presenceChannel.postMessage({ type: 'bye' });
           if (appState.firebasePresenceUrl) {
             const baseUrl = appState.firebasePresenceUrl.replace(/\/$/, '');
-            navigator.sendBeacon && fetch(`${baseUrl}/sohaco_online/${SESSION_TAB_ID}.json`, { method: 'DELETE', keepalive: true });
+            fetch(`${baseUrl}/sohaco_online/${SESSION_TAB_ID}.json`, { method: 'DELETE', keepalive: true });
           }
         } catch (e) {}
       });
+
+      setInterval(tickCloudOrLocalPresence, 6000);
       setInterval(() => {
-        if (appState.firebasePresenceUrl) tickFirebasePresence();
-        else tickLocalPresence();
-      }, 5000);
-      if (appState.firebasePresenceUrl) tickFirebasePresence();
+        if (!isAdminMode) pullStateFromCloud();
+      }, 20000);
     }
 
-    function configureRealtimePresence() {
-      const url = prompt(
-        'Nhập đường dẫn Firebase Realtime Database (VD: https://ten-project-default-rtdb.firebaseio.com) để đếm chính xác số người online trên tất cả máy tính/điện thoại cùng truy cập (để trống nếu dùng đếm trên trình duyệt hiện tại):',
-        appState.firebasePresenceUrl || ''
-      );
-      if (url === null) return;
-      appState.firebasePresenceUrl = url.trim();
-      saveState();
-      if (appState.firebasePresenceUrl) tickFirebasePresence();
-      else tickLocalPresence();
-      showToast('Đã lưu cấu hình đếm số người online!');
+    function openCloudConfigModal() {
+      document.getElementById('cfgCloudSyncUrl').value = appState.cloudSyncUrl || '';
+      document.getElementById('cfgFirebaseUrl').value = appState.firebasePresenceUrl || '';
+      document.getElementById('cloudConfigModal').classList.remove('hidden');
     }
 
-    // -------------------- 3. PER-USER LIGHT / DARK MODE --------------------
+    function saveCloudSettings() {
+      appState.cloudSyncUrl = document.getElementById('cfgCloudSyncUrl').value.trim();
+      appState.firebasePresenceUrl = document.getElementById('cfgFirebaseUrl').value.trim();
+      saveState(false);
+      updateSyncBadge();
+      tickCloudOrLocalPresence();
+      pullStateFromCloud();
+      closeModal('cloudConfigModal');
+      showToast('Đã lưu cấu hình Đồng bộ đa thiết bị!');
+    }
+
+    async function syncProductsFromGoogleDrive() {
+      if (!appState.cloudSyncUrl) {
+        alert('Vui lòng dán URL Google Apps Script vào ô số 1 trước khi quét.');
+        return;
+      }
+      try {
+        showToast('Đang quét danh sách sản phẩm từ Google Drive...');
+        const res = await fetch(`${appState.cloudSyncUrl}?action=scanDrive&t=${Date.now()}`);
+        const data = await res.json();
+        if (!data || !Array.isArray(data.items) || data.items.length === 0) {
+          alert('Không tìm thấy tệp/thư mục sản phẩm mới trong thư mục Drive.');
+          return;
+        }
+        const nowStr = formatNowHHMMSSDDMMYYYY(new Date());
+        const newItems = data.items.map((it, idx) => ({
+          id: 'drv_' + Date.now() + '_' + idx,
+          groupName: 'Nhóm 1.1',
+          productType: 'Thuốc',
+          code: 'DRV-' + (idx + 1),
+          name: it.name,
+          ingredient: 'Đồng bộ từ Google Drive',
+          imageUrl: '',
+          imageSizePx: 52,
+          imageFit: 'contain',
+          usageRoute: 'Đang cập nhật',
+          boxSpec: 'Theo hồ sơ Drive',
+          cartonSpec: 'Theo hồ sơ Drive',
+          priceExclVat: 0,
+          vatRate: 5,
+          regNumber: 'Theo hồ sơ',
+          regDate: '',
+          atcCode: '',
+          atcClass: '',
+          channels: ['Nhà thuốc', 'Quầy thuốc'],
+          status: 'Đang kinh doanh',
+          statusUpdatedAt: nowStr,
+          fileUrl: it.url,
+          driveUpdatedAt: (it.updatedAt || '').slice(0, 10),
+          dossierFiles: (it.files && it.files.length > 0) ? it.files : [{ id: 'f_drv_' + idx, label: it.name, url: it.url }],
+          prescriptionType: 'Thuốc kê đơn',
+          essentialType: 'Thuốc thiết yếu',
+          davUrl: DAV_LOOKUP_URL
+        }));
+        appState.products = [...newItems, ...appState.products];
+        saveState(true);
+        closeModal('cloudConfigModal');
+        renderTabsAndWorkspace();
+        showToast(`Đã đồng bộ ${newItems.length} sản phẩm từ Google Drive!`);
+      } catch (e) {
+        alert('Lỗi kết nối Apps Script khi quét Drive. Hãy kiểm tra quyền truy cập Web App ("Anyone").');
+      }
+    }
+
+    // -------------------- 3. IMAGE COMPRESSION & RESIZE --------------------
+    function compressImageToDataUrl(file, maxDimension = 500, callback) {
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        const img = new Image();
+        img.onload = function() {
+          let w = img.width, h = img.height;
+          if (w > maxDimension || h > maxDimension) {
+            if (w >= h) { h = Math.round(h * maxDimension / w); w = maxDimension; }
+            else { w = Math.round(w * maxDimension / h); h = maxDimension; }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          const mime = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
+          callback(canvas.toDataURL(mime, 0.85));
+        };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function handleLogoUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      compressImageToDataUrl(file, 450, (dataUrl) => {
+        appState.logoDataUrl = dataUrl;
+        saveState(true);
+        renderLogo();
+        showToast('Đã cập nhật Logo SOHACO GROUP!');
+      });
+    }
+
+    function previewLogoSize(px) {
+      const size = Math.max(64, Math.min(200, Number(px) || 96));
+      const box = document.getElementById('logoPreviewContainer');
+      const label = document.getElementById('logoSizeLabel');
+      if (box) { box.style.width = size + 'px'; box.style.height = size + 'px'; }
+      if (label) label.textContent = size + 'px';
+    }
+
+    function commitLogoSize(px) {
+      appState.logoSizePx = Math.max(64, Math.min(200, Number(px) || 96));
+      saveState(true);
+      showToast(`Đã lưu kích thước Logo: ${appState.logoSizePx}px`);
+    }
+
+    function renderLogo() {
+      const img = document.getElementById('companyLogoImg');
+      const fallback = document.getElementById('companyLogoFallback');
+      const modalImg = document.getElementById('modalLogoImg');
+      const modalFallback = document.getElementById('modalLogoFallback');
+      const size = Number(appState.logoSizePx) || 96;
+
+      previewLogoSize(size);
+      const slider = document.getElementById('logoSizeSlider');
+      if (slider) slider.value = size;
+
+      if (appState.logoDataUrl) {
+        img.src = appState.logoDataUrl;
+        img.classList.remove('hidden');
+        fallback.classList.add('hidden');
+        if (modalImg) { modalImg.src = appState.logoDataUrl; modalImg.classList.remove('hidden'); modalFallback.classList.add('hidden'); }
+      } else {
+        img.classList.add('hidden');
+        fallback.classList.remove('hidden');
+        if (modalImg) { modalImg.classList.add('hidden'); modalFallback.classList.remove('hidden'); }
+      }
+    }
+
+    // -------------------- 4. PER-USER LIGHT / DARK MODE --------------------
     function applyUserTheme(theme) {
       const htmlEl = document.documentElement;
       if (theme === 'dark') htmlEl.classList.add('dark');
       else htmlEl.classList.remove('dark');
 
-      document.querySelectorAll('.theme-icon-slot').forEach(el => {
-        el.textContent = theme === 'dark' ? '☀️' : '🌙';
-      });
-      document.querySelectorAll('.theme-label-slot').forEach(el => {
-        el.textContent = theme === 'dark' ? 'Giao diện sáng' : 'Giao diện tối';
-      });
+      document.querySelectorAll('.theme-icon-slot').forEach(el => { el.textContent = theme === 'dark' ? '☀️' : '🌙'; });
+      document.querySelectorAll('.theme-label-slot').forEach(el => { el.textContent = theme === 'dark' ? 'Giao diện sáng' : 'Giao diện tối'; });
     }
 
     function toggleUserTheme() {
@@ -950,11 +1273,11 @@
       applyUserTheme(saved);
     }
 
-    // -------------------- 4. FORMAT HELPERS --------------------
+    // -------------------- 5. FORMAT HELPERS --------------------
     function formatCurrencyVND(num) {
       const n = Number(num);
       if (isNaN(n)) return '0 đ';
-      return n.toLocaleString('vi-VN') + ' đ';
+      return Math.round(n).toLocaleString('vi-VN') + ' đ';
     }
 
     function formatDateDDMMYYYY(val) {
@@ -981,7 +1304,7 @@
       return `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())} ${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()}`;
     }
 
-    // -------------------- 5. ADMIN LOGIN / AUTH --------------------
+    // -------------------- 6. ADMIN LOGIN / AUTH --------------------
     function handleAdminAuthClick() {
       if (isAdminMode) {
         if (confirm('Bạn muốn đăng xuất khỏi quyền Quản trị (Admin)?')) {
@@ -1033,7 +1356,7 @@
         return;
       }
       appState.adminAuth.passwordHash = newP;
-      saveState();
+      saveState(false);
       closeModal('changePasswordModal');
       showToast('Đã đổi mật khẩu Admin thành công!');
     }
@@ -1043,21 +1366,24 @@
       const txt = document.getElementById('modeIndicatorText');
       const mobileBtn = document.getElementById('adminToggleBtnMobile');
       const banner = document.getElementById('adminBannerBadge');
+      const resizeBar = document.getElementById('adminLogoResizeBar');
 
       if (isAdminMode) {
         dot.className = 'w-2 h-2 rounded-full bg-amber-500';
         txt.textContent = 'Chế độ: Admin (Thoát)';
         mobileBtn.textContent = 'Chế độ: Admin';
         banner.classList.remove('hidden');
+        resizeBar.classList.remove('hidden');
       } else {
         dot.className = 'w-2 h-2 rounded-full bg-emerald-500';
         txt.textContent = 'Chế độ: Nhân viên';
         mobileBtn.textContent = 'Chế độ: Nhân viên';
         banner.classList.add('hidden');
+        resizeBar.classList.add('hidden');
       }
     }
 
-    // -------------------- 6. INSTANT MULTI-LABEL FILTER + NON-CONTIGUOUS SEARCH --------------------
+    // -------------------- 7. SEARCH & DEDICATED ADVANCED FILTER MODAL --------------------
     function removeVietnameseTones(str) {
       return (str || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd');
     }
@@ -1087,11 +1413,7 @@
       for (let i = 0; i < qClean.length; i++) {
         const ch = qClean[i];
         for (let j = 0; j < tNorm.length; j++) {
-          if (!usedIndices.has(j) && tNorm[j] === ch) {
-            usedIndices.add(j);
-            foundCount++;
-            break;
-          }
+          if (!usedIndices.has(j) && tNorm[j] === ch) { usedIndices.add(j); foundCount++; break; }
         }
       }
       if (foundCount === qClean.length) return { score: 45, indices: usedIndices };
@@ -1108,6 +1430,19 @@
       return result;
     }
 
+    function openAdvancedFilterModal() {
+      document.getElementById('searchResultsDropdown').classList.add('hidden');
+      document.getElementById('modalSearchInput').value = document.getElementById('globalSearchInput').value;
+      renderFilterLabels();
+      updateAdvancedFilterResults();
+      document.getElementById('advancedFilterModal').classList.remove('hidden');
+    }
+
+    function syncModalSearchInput(val) {
+      document.getElementById('globalSearchInput').value = val;
+      updateAdvancedFilterResults();
+    }
+
     function renderFilterLabels() {
       const modDefs = [
         { val: 'product-catalog', label: 'Hồ sơ & Danh mục SP' },
@@ -1118,7 +1453,7 @@
       document.getElementById('filterModuleLabels').innerHTML = modDefs.map(d => {
         const checked = searchFilters.modules.has(d.val);
         return `
-          <label class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border cursor-pointer select-none transition ${checked ? 'bg-sky-700 text-white border-sky-700' : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700'}">
+          <label class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border cursor-pointer select-none transition ${checked ? 'bg-sky-700 text-white border-sky-700' : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700'}">
             <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleSearchLabel('modules', '${d.val}')" class="w-3.5 h-3.5 accent-sky-500" />
             <span class="font-semibold">${d.label}</span>
           </label>
@@ -1128,7 +1463,7 @@
       document.getElementById('filterProductTypeLabels').innerHTML = PRODUCT_TYPES.map(pt => {
         const checked = searchFilters.productTypes.has(pt);
         return `
-          <label class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border cursor-pointer select-none transition ${checked ? 'bg-teal-700 text-white border-teal-700' : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700'}">
+          <label class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border cursor-pointer select-none transition ${checked ? 'bg-teal-700 text-white border-teal-700' : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700'}">
             <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleSearchLabel('productTypes', '${pt}')" class="w-3.5 h-3.5 accent-teal-500" />
             <span class="font-semibold">${pt}</span>
           </label>
@@ -1138,7 +1473,7 @@
       document.getElementById('filterStatusLabels').innerHTML = STATUS_OPTIONS.map(st => {
         const checked = searchFilters.statuses.has(st);
         return `
-          <label class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border cursor-pointer select-none transition ${checked ? 'bg-emerald-700 text-white border-emerald-700' : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700'}">
+          <label class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border cursor-pointer select-none transition ${checked ? 'bg-emerald-700 text-white border-emerald-700' : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700'}">
             <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleSearchLabel('statuses', '${st}')" class="w-3.5 h-3.5 accent-emerald-500" />
             <span class="font-semibold">${st}</span>
           </label>
@@ -1148,7 +1483,7 @@
       document.getElementById('filterChannelLabels').innerHTML = CHANNEL_OPTIONS.map(ch => {
         const checked = searchFilters.channels.has(ch.value);
         return `
-          <label class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border cursor-pointer select-none transition ${checked ? 'bg-indigo-700 text-white border-indigo-700' : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700'}">
+          <label class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border cursor-pointer select-none transition ${checked ? 'bg-indigo-700 text-white border-indigo-700' : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700'}">
             <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleSearchLabel('channels', '${ch.value}')" class="w-3.5 h-3.5 accent-indigo-500" />
             <span class="font-semibold">${ch.value}</span>
           </label>
@@ -1169,7 +1504,7 @@
       if (searchFilters[group].has(value)) searchFilters[group].delete(value);
       else searchFilters[group].add(value);
       renderFilterLabels();
-      updateAdvancedFilterResults(); // Cập nhật kết quả ngay lập tức mà KHÔNG đóng bảng bộ lọc
+      updateAdvancedFilterResults();
     }
 
     function resetSearchFilters() {
@@ -1177,19 +1512,10 @@
       searchFilters.productTypes.clear();
       searchFilters.statuses.clear();
       searchFilters.channels.clear();
+      document.getElementById('modalSearchInput').value = '';
+      document.getElementById('globalSearchInput').value = '';
       renderFilterLabels();
       updateAdvancedFilterResults();
-    }
-
-    function toggleAdvancedSearchPanel() {
-      const panel = document.getElementById('advancedSearchPanel');
-      const dropdown = document.getElementById('searchResultsDropdown');
-      renderFilterLabels();
-      panel.classList.toggle('hidden');
-      if (!panel.classList.contains('hidden')) {
-        dropdown.classList.add('hidden');
-        updateAdvancedFilterResults();
-      }
     }
 
     function buildSearchIndex() {
@@ -1273,8 +1599,8 @@
       if (matches.length === 0) {
         return `<div class="p-6 text-center text-sm text-slate-500 dark:text-slate-400">Không tìm thấy kết quả phù hợp với từ khóa & nhãn đã chọn.</div>`;
       }
-      return matches.slice(0, 25).map(m => `
-        <button onclick="jumpToSearchResult('${m.module}', '${m.id}')" class="w-full text-left px-4 py-2.5 hover:bg-sky-50 dark:hover:bg-slate-800 transition flex items-start justify-between gap-3">
+      return matches.slice(0, 30).map(m => `
+        <button onclick="jumpToSearchResult('${m.module}', '${m.id}')" class="w-full text-left px-4 py-3 hover:bg-sky-50 dark:hover:bg-slate-800 transition flex items-start justify-between gap-3">
           <div class="min-w-0">
             <div class="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">${m.titleHtml}</div>
             <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">${m.subHtml}</div>
@@ -1285,7 +1611,7 @@
     }
 
     function updateAdvancedFilterResults() {
-      const query = document.getElementById('globalSearchInput').value.trim();
+      const query = (document.getElementById('modalSearchInput').value || '').trim();
       const matches = computeSearchMatches(query);
       document.getElementById('advResultsCountText').textContent = `Tìm thấy ${matches.length} kết quả phù hợp`;
       document.getElementById('advResultsList').innerHTML = renderMatchesHtml(matches);
@@ -1294,20 +1620,12 @@
     function handleGlobalSearch() {
       const input = document.getElementById('globalSearchInput');
       const query = input.value.trim();
-      const advPanel = document.getElementById('advancedSearchPanel');
       const dropdown = document.getElementById('searchResultsDropdown');
       const clearBtn = document.getElementById('clearSearchBtn');
       const hasFilters = searchFilters.modules.size + searchFilters.productTypes.size + searchFilters.statuses.size + searchFilters.channels.size > 0;
 
       if (query) clearBtn.classList.remove('hidden');
       else clearBtn.classList.add('hidden');
-
-      // Nếu bảng bộ lọc mở rộng đang mở, chỉ cập nhật ngay bên trong bảng đó
-      if (!advPanel.classList.contains('hidden')) {
-        updateAdvancedFilterResults();
-        dropdown.classList.add('hidden');
-        return;
-      }
 
       if (!query && !hasFilters) {
         dropdown.classList.add('hidden');
@@ -1320,15 +1638,6 @@
       dropdown.classList.remove('hidden');
     }
 
-    function triggerSearchButton() {
-      const advPanel = document.getElementById('advancedSearchPanel');
-      if (!advPanel.classList.contains('hidden')) {
-        updateAdvancedFilterResults();
-      } else {
-        handleGlobalSearch();
-      }
-    }
-
     function clearGlobalSearch() {
       document.getElementById('globalSearchInput').value = '';
       resetSearchFilters();
@@ -1338,7 +1647,7 @@
 
     function jumpToSearchResult(moduleName, itemId) {
       document.getElementById('searchResultsDropdown').classList.add('hidden');
-      document.getElementById('advancedSearchPanel').classList.add('hidden');
+      closeModal('advancedFilterModal');
       if (moduleName === 'product-catalog') {
         appState.activeProductTypeFilter = 'ALL';
         appState.activeGroupFilter = 'ALL';
@@ -1346,11 +1655,11 @@
       }
       appState.activeTab = moduleName;
       activeHighlightId = itemId;
-      saveState();
+      saveState(false);
       renderTabsAndWorkspace();
 
       setTimeout(() => {
-        const el = document.getElementById(`item-${itemId}`);
+        const el = document.getElementById(`item-${itemId}`) || document.getElementById(`mobile-item-${itemId}`);
         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }, 100);
     }
@@ -1359,47 +1668,14 @@
       const wrapper = document.getElementById('searchWrapper');
       if (wrapper && !wrapper.contains(e.target)) {
         document.getElementById('searchResultsDropdown').classList.add('hidden');
-        document.getElementById('advancedSearchPanel').classList.add('hidden');
       }
     });
-
-    // -------------------- 7. LOGO UPLOAD --------------------
-    function handleLogoUpload(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        appState.logoDataUrl = e.target.result;
-        saveState();
-        renderLogo();
-        showToast('Đã cập nhật Logo SOHACO GROUP!');
-      };
-      reader.readAsDataURL(file);
-    }
-
-    function renderLogo() {
-      const img = document.getElementById('companyLogoImg');
-      const fallback = document.getElementById('companyLogoFallback');
-      const modalImg = document.getElementById('modalLogoImg');
-      const modalFallback = document.getElementById('modalLogoFallback');
-
-      if (appState.logoDataUrl) {
-        img.src = appState.logoDataUrl;
-        img.classList.remove('hidden');
-        fallback.classList.add('hidden');
-        if (modalImg) { modalImg.src = appState.logoDataUrl; modalImg.classList.remove('hidden'); modalFallback.classList.add('hidden'); }
-      } else {
-        img.classList.add('hidden');
-        fallback.classList.remove('hidden');
-        if (modalImg) { modalImg.classList.add('hidden'); modalFallback.classList.remove('hidden'); }
-      }
-    }
 
     // -------------------- 8. HORIZONTAL TABS --------------------
     function selectMainTab(tabId) {
       appState.activeTab = tabId;
       activeHighlightId = null;
-      saveState();
+      saveState(false);
       renderTabsAndWorkspace();
     }
 
@@ -1410,7 +1686,7 @@
         return `
           <button onclick="selectMainTab('${tab.id}')" class="text-left p-3.5 rounded-2xl border-2 transition-all duration-200 flex items-start gap-3 ${
             isActive
-              ? 'bg-white dark:bg-sky-900/90 border-sky-500 shadow-xl ring-4 ring-sky-400/25 opacity-100 scale-[1.02]'
+              ? 'bg-white dark:bg-sky-900/90 border-sky-500 shadow-xl ring-4 ring-sky-400/25 opacity-100 scale-[1.01]'
               : 'bg-slate-700/90 dark:bg-slate-900/80 border-slate-600 dark:border-slate-800 opacity-70 hover:opacity-90'
           }">
             <div class="w-10 h-10 rounded-xl bg-gradient-to-br ${tab.iconBg} text-white flex items-center justify-center shrink-0 shadow-sm">
@@ -1435,11 +1711,11 @@
       }
     }
 
-    // -------------------- 9. TAB 1: DANH MỤC SẢN PHẨM (BỐ CỤC TINH GỌN MỚI) --------------------
+    // -------------------- 9. TAB 1: DANH MỤC SẢN PHẨM --------------------
     function setProductFilter(key, val) {
       appState[key] = val;
       activeHighlightId = null;
-      saveState();
+      saveState(false);
       renderTabsAndWorkspace();
     }
 
@@ -1473,6 +1749,23 @@
       return '';
     }
 
+    function renderProductImageHtml(item) {
+      const sz = Math.max(36, Math.min(120, Number(item.imageSizePx) || 52));
+      const fit = item.imageFit === 'cover' ? 'object-cover' : 'object-contain';
+      if (item.imageUrl) {
+        return `
+          <div style="width: ${sz}px; height: ${sz}px;" class="rounded-xl border border-slate-200 dark:border-slate-700 bg-white overflow-hidden flex items-center justify-center shrink-0 shadow-sm">
+            <img src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(item.name)}" class="w-full h-full ${fit}" />
+          </div>
+        `;
+      }
+      return `
+        <div style="width: ${sz}px; height: ${sz}px;" class="rounded-xl border border-slate-200 dark:border-slate-700 bg-sky-50 dark:bg-slate-800 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0">
+          <svg class="w-6 h-6 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 3h6m-5 0v3l-3.5 3.5A2 2 0 006 10.914V19a2 2 0 002 2h8a2 2 0 002-2v-8.086a2 2 0 00-.586-1.414L14 6V3"/></svg>
+        </div>
+      `;
+    }
+
     function renderMergedProductCatalog(container, highlightId) {
       const pTypeFilter = appState.activeProductTypeFilter || 'ALL';
       const groupFilter = appState.activeGroupFilter || 'ALL';
@@ -1489,7 +1782,6 @@
       const allGroupNames = Array.from(new Set([...PRODUCT_GROUPS, ...appState.products.map(p => p.groupName).filter(Boolean)]));
 
       container.innerHTML = `
-        <!-- Header & Excel Tools -->
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-4 border-b border-slate-200 dark:border-slate-800">
           <div>
             <h3 class="text-lg font-extrabold text-slate-900 dark:text-white">1. Danh mục sản phẩm</h3>
@@ -1512,7 +1804,6 @@
           </div>
         </div>
 
-        <!-- 3 ô bảng chọn lọc ngang trên CÙNG 1 HÀNG (Loại sản phẩm | Phân nhóm | Trạng thái) -->
         <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3 bg-slate-50 dark:bg-slate-800/50 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800">
           <div>
             <label class="block text-[11px] font-bold uppercase text-slate-500 dark:text-slate-400 mb-1">Loại sản phẩm</label>
@@ -1522,7 +1813,7 @@
             </select>
           </div>
           <div>
-            <label class="block text-[11px] font-bold uppercase text-slate-500 dark:text-slate-400 mb-1">Phân nhóm sản phẩm</label>
+            <label class="block text-[11px] font-bold uppercase text-slate-500 dark:text-slate-400 mb-1">Phân nhóm</label>
             <select onchange="setProductFilter('activeGroupFilter', this.value)" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:border-sky-500 focus:outline-none">
               <option value="ALL" ${groupFilter === 'ALL' ? 'selected' : ''}>Tất cả</option>
               ${allGroupNames.map(g => `<option value="${escapeHtml(g)}" ${groupFilter === g ? 'selected' : ''}>${escapeHtml(g)}</option>`).join('')}
@@ -1537,103 +1828,90 @@
           </div>
         </div>
 
-        <!-- Chú thích màu trạng thái trực quan (phục vụ cả Desktop & Điện thoại) -->
         <div class="mt-3 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500 dark:text-slate-400 px-1">
           <div class="flex flex-wrap items-center gap-4">
-            <span class="font-semibold text-slate-600 dark:text-slate-300">Chú thích màu tên sản phẩm:</span>
+            <span class="font-semibold text-slate-600 dark:text-slate-300">Tình trạng (Màu tên SP):</span>
             <span class="inline-flex items-center gap-1.5 font-semibold text-emerald-700 dark:text-emerald-400"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Đang kinh doanh</span>
             <span class="inline-flex items-center gap-1.5 font-semibold text-amber-600 dark:text-yellow-400"><span class="w-2.5 h-2.5 rounded-full bg-yellow-400"></span> Tạm ngưng</span>
             <span class="inline-flex items-center gap-1.5 font-semibold text-red-600 dark:text-red-400"><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span> Ngưng kinh doanh</span>
           </div>
-          <span class="text-[11px] italic">(Rê chuột hoặc chạm vào biểu tượng chấm màu trên điện thoại để xem chi tiết cập nhật)</span>
+          <span class="text-[11px] italic hidden lg:inline">(Đưa chuột vào tên sản phẩm để xem thời gian cập nhật)</span>
         </div>
 
-        <!-- Bảng ngang tinh gọn, dễ nhìn -->
-        <div class="mt-2.5 overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700">
-          <table class="w-full text-left border-collapse">
+        <!-- 1. GIAO DIỆN MÁY TÍNH (FIT TOÀN MÀN HÌNH, KHÔNG KÉO NGANG) -->
+        <div class="hidden lg:block mt-2.5 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+          <table class="w-full text-left border-collapse table-auto">
             <thead>
               <tr class="bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[11px] uppercase border-b border-slate-200 dark:border-slate-700">
-                <th class="p-3 w-10 text-center">
+                <th class="px-2 py-2.5 w-9 text-center">
                   <input type="checkbox" ${allSelected ? 'checked' : ''} onchange="toggleSelectAllProducts(this.checked)" class="w-4 h-4 accent-blue-600 cursor-pointer" title="Chọn tất cả" />
                 </th>
-                <th class="p-3 min-w-[230px]">Tên sản phẩm</th>
-                <th class="p-3 min-w-[120px]">Dạng sử dụng</th>
-                <th class="p-3 min-w-[185px]">Quy cách</th>
-                <th class="p-3 text-right min-w-[110px]">Giá</th>
-                <th class="p-3 text-right min-w-[95px]">VAT</th>
-                <th class="p-3 text-right min-w-[115px]">Giá có VAT</th>
-                <th class="p-3 min-w-[140px]">Số đăng ký</th>
-                <th class="p-3 text-right min-w-[165px]">Thao tác</th>
+                <th class="px-2 py-2.5 w-16 text-center">Ảnh</th>
+                <th class="px-2.5 py-2.5">Tên sản phẩm</th>
+                <th class="px-2 py-2.5">Dạng sử dụng</th>
+                <th class="px-2 py-2.5">Quy cách</th>
+                <th class="px-2 py-2.5 text-right">Giá</th>
+                <th class="px-2 py-2.5 text-center">VAT</th>
+                <th class="px-2 py-2.5 text-right">Giá có VAT</th>
+                <th class="px-2 py-2.5">Số đăng ký</th>
+                <th class="px-2.5 py-2.5 text-right">Thao tác</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-slate-100 dark:divide-slate-800 text-sm">
+            <tbody class="divide-y divide-slate-100 dark:divide-slate-800 text-xs sm:text-sm">
               ${filtered.length === 0 ? `
-                <tr><td colspan="9" class="p-8 text-center text-sm text-slate-400">Không có sản phẩm nào khớp với bộ lọc hiện tại.</td></tr>
+                <tr><td colspan="10" class="p-8 text-center text-sm text-slate-400">Không có sản phẩm nào khớp với bộ lọc hiện tại.</td></tr>
               ` : filtered.map(item => {
                 const priceExcl = Number(item.priceExclVat) || 0;
-                const vat = Number(item.vatAmount) || 0;
-                const priceIncl = priceExcl + vat;
+                const vatRate = Number(item.vatRate) || 0;
+                const priceIncl = Math.round(priceExcl * (1 + vatRate / 100));
                 const statusTooltip = `Tình trạng: ${item.status} • Cập nhật: ${item.statusUpdatedAt || 'Chưa rõ'}`;
                 return `
                   <tr id="item-${item.id}" class="${highlightId === item.id ? 'bg-yellow-50 dark:bg-amber-950/40 ring-2 ring-amber-400' : 'hover:bg-slate-50/80 dark:hover:bg-slate-800/50'} transition align-middle">
-                    <td class="p-3 text-center">
+                    <td class="px-2 py-2.5 text-center">
                       <input type="checkbox" ${selectedProductIds.has(item.id) ? 'checked' : ''} onchange="toggleProductSelection('${item.id}')" class="w-4 h-4 accent-blue-600 cursor-pointer" />
                     </td>
-
-                    <!-- Cột Tên sản phẩm: Dòng 1 Tên SP (theo màu trạng thái) | Dòng 2 Thành phần -->
-                    <td class="p-3">
-                      <div class="flex items-center gap-2 group relative">
-                        <button type="button" onclick="showMobileStatusHint('${item.id}')" title="${escapeHtml(statusTooltip)}" class="w-2.5 h-2.5 rounded-full shrink-0 ${getStatusDotColorClass(item.status)} focus:outline-none"></button>
-                        <span title="${escapeHtml(statusTooltip)}" onclick="showMobileStatusHint('${item.id}')" class="font-bold cursor-pointer ${getProductNameColorClass(item.status)}">
+                    <td class="px-2 py-2.5 text-center">
+                      <div class="inline-flex justify-center">${renderProductImageHtml(item)}</div>
+                    </td>
+                    <td class="px-2.5 py-2.5">
+                      <div class="flex items-center gap-1.5">
+                        <span title="${escapeHtml(statusTooltip)}" onclick="showMobileStatusHint('${item.id}')" class="w-2 h-2 rounded-full shrink-0 cursor-pointer ${getStatusDotColorClass(item.status)}"></span>
+                        <span title="${escapeHtml(statusTooltip)}" onclick="showMobileStatusHint('${item.id}')" class="font-bold text-sm cursor-pointer leading-snug ${getProductNameColorClass(item.status)}">
                           ${escapeHtml(item.name)}
                         </span>
                       </div>
-                      <div class="text-xs text-slate-500 dark:text-slate-400 mt-1 pl-4">
+                      <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5 pl-3.5 leading-snug">
                         ${escapeHtml(item.ingredient)}
                       </div>
                     </td>
-
-                    <!-- Cột Dạng sử dụng -->
-                    <td class="p-3 text-xs text-slate-700 dark:text-slate-300 font-medium">
-                      ${escapeHtml(item.usageRoute || 'Chưa cập nhật')}
+                    <td class="px-2 py-2.5 text-xs text-slate-700 dark:text-slate-300 font-medium">
+                      ${escapeHtml(item.usageRoute || '—')}
                     </td>
-
-                    <!-- Cột Quy cách: Hộp và Thùng -->
-                    <td class="p-3 text-xs text-slate-700 dark:text-slate-300 space-y-0.5">
+                    <td class="px-2 py-2.5 text-xs text-slate-700 dark:text-slate-300 space-y-0.5 leading-snug">
                       <div><span class="text-slate-400">Hộp:</span> ${escapeHtml(item.boxSpec || '—')}</div>
                       <div><span class="text-slate-400">Thùng:</span> ${escapeHtml(item.cartonSpec || '—')}</div>
                     </td>
-
-                    <!-- Cột Giá (chưa VAT) -->
-                    <td class="p-3 text-right text-xs font-semibold text-slate-800 dark:text-slate-200 whitespace-nowrap">
+                    <td class="px-2 py-2.5 text-right text-xs font-semibold text-slate-800 dark:text-slate-200 whitespace-nowrap">
                       ${formatCurrencyVND(priceExcl)}
                     </td>
-
-                    <!-- Cột VAT -->
-                    <td class="p-3 text-right text-xs text-slate-600 dark:text-slate-400 whitespace-nowrap">
-                      ${formatCurrencyVND(vat)}
+                    <td class="px-2 py-2.5 text-center text-xs font-bold text-slate-600 dark:text-slate-300 whitespace-nowrap">
+                      ${vatRate}%
                     </td>
-
-                    <!-- Cột Giá có VAT (Tổng giá chưa VAT + VAT) -->
-                    <td class="p-3 text-right text-xs font-extrabold text-sky-800 dark:text-sky-400 whitespace-nowrap">
+                    <td class="px-2 py-2.5 text-right text-xs font-extrabold text-sky-800 dark:text-sky-400 whitespace-nowrap">
                       ${formatCurrencyVND(priceIncl)}
                     </td>
-
-                    <!-- Cột Số đăng ký -->
-                    <td class="p-3 text-xs font-semibold text-slate-700 dark:text-slate-200 whitespace-nowrap">
+                    <td class="px-2 py-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 whitespace-nowrap">
                       ${escapeHtml(item.regNumber)}
                     </td>
-
-                    <!-- Cột Thao tác: Chi tiết & Gửi (+ Sửa/Xóa khi Admin) -->
-                    <td class="p-3 text-right whitespace-nowrap">
-                      <div class="flex flex-wrap justify-end gap-1.5">
+                    <td class="px-2.5 py-2.5 text-right whitespace-nowrap">
+                      <div class="flex justify-end gap-1.5">
                         <button onclick="openProductDetailModal('${item.id}')" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">Chi tiết</button>
                         <button onclick="openProductSendModal('${item.id}')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-sm">Gửi</button>
                       </div>
                       ${isAdminMode ? `
-                        <div class="mt-1.5 flex justify-end gap-1.5">
-                          <button onclick="openAdminModal('product-catalog', '${item.id}')" class="px-2 py-1 rounded text-[11px] bg-amber-100 text-amber-800 font-semibold">Sửa</button>
-                          <button onclick="deleteItem('products', '${item.id}')" class="px-2 py-1 rounded text-[11px] bg-rose-100 text-rose-700 font-semibold">Xóa</button>
+                        <div class="mt-1 flex justify-end gap-1.5">
+                          <button onclick="openAdminModal('product-catalog', '${item.id}')" class="px-2 py-0.5 rounded text-[11px] bg-amber-100 text-amber-800 font-semibold">Sửa</button>
+                          <button onclick="deleteItem('products', '${item.id}')" class="px-2 py-0.5 rounded text-[11px] bg-rose-100 text-rose-700 font-semibold">Xóa</button>
                         </div>
                       ` : ''}
                     </td>
@@ -1643,6 +1921,60 @@
             </tbody>
           </table>
         </div>
+
+        <!-- 2. GIAO DIỆN ĐIỆN THOẠI (GỌN, KHÔNG CẦN KÉO NGANG) -->
+        <div class="block lg:hidden mt-3 space-y-3">
+          <div class="flex items-center justify-between px-1">
+            <label class="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-300">
+              <input type="checkbox" ${allSelected ? 'checked' : ''} onchange="toggleSelectAllProducts(this.checked)" class="w-4 h-4 accent-blue-600" />
+              <span>Chọn tất cả (${filtered.length} sản phẩm)</span>
+            </label>
+          </div>
+          ${filtered.length === 0 ? `
+            <div class="p-8 text-center text-sm text-slate-400 border border-slate-200 dark:border-slate-800 rounded-2xl">Không có sản phẩm nào khớp với bộ lọc hiện tại.</div>
+          ` : filtered.map(item => {
+            const priceExcl = Number(item.priceExclVat) || 0;
+            const vatRate = Number(item.vatRate) || 0;
+            const priceIncl = Math.round(priceExcl * (1 + vatRate / 100));
+            return `
+              <div id="mobile-item-${item.id}" class="p-3.5 rounded-2xl border ${highlightId === item.id ? 'border-amber-400 bg-yellow-50 dark:bg-amber-950/30 ring-2 ring-amber-300' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900'} shadow-sm space-y-2.5">
+                <div class="flex items-start gap-2.5">
+                  <input type="checkbox" ${selectedProductIds.has(item.id) ? 'checked' : ''} onchange="toggleProductSelection('${item.id}')" class="mt-1 w-4 h-4 accent-blue-600 shrink-0" />
+                  ${renderProductImageHtml(item)}
+                  <div class="min-w-0 flex-1">
+                    <div class="flex items-start justify-between gap-2">
+                      <div onclick="showMobileStatusHint('${item.id}')" class="font-bold text-sm leading-snug ${getProductNameColorClass(item.status)}">
+                        ${escapeHtml(item.name)}
+                      </div>
+                      <span class="shrink-0 inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 ${getProductNameColorClass(item.status)}">
+                        <span class="w-1.5 h-1.5 rounded-full ${getStatusDotColorClass(item.status)}"></span>
+                        ${escapeHtml(item.status)}
+                      </span>
+                    </div>
+                    <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">${escapeHtml(item.ingredient)}</div>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs bg-slate-50 dark:bg-slate-800/70 p-2.5 rounded-xl border border-slate-100 dark:border-slate-700">
+                  <div><span class="text-slate-400">Dạng dùng:</span> <strong class="text-slate-700 dark:text-slate-200">${escapeHtml(item.usageRoute || '—')}</strong></div>
+                  <div><span class="text-slate-400">Số ĐK:</span> <strong class="text-slate-700 dark:text-slate-200">${escapeHtml(item.regNumber)}</strong></div>
+                  <div class="col-span-2"><span class="text-slate-400">Quy cách:</span> Hộp ${escapeHtml(item.boxSpec || '—')} • Thùng ${escapeHtml(item.cartonSpec || '—')}</div>
+                  <div><span class="text-slate-400">Giá chưa VAT:</span> <strong>${formatCurrencyVND(priceExcl)}</strong></div>
+                  <div><span class="text-slate-400">VAT:</span> <strong>${vatRate}%</strong> • Có VAT: <strong class="text-sky-700 dark:text-sky-400">${formatCurrencyVND(priceIncl)}</strong></div>
+                </div>
+
+                <div class="flex items-center justify-end gap-2">
+                  ${isAdminMode ? `
+                    <button onclick="openAdminModal('product-catalog', '${item.id}')" class="px-2.5 py-2 rounded-xl text-xs bg-amber-100 text-amber-800 font-semibold">Sửa</button>
+                    <button onclick="deleteItem('products', '${item.id}')" class="px-2.5 py-2 rounded-xl text-xs bg-rose-100 text-rose-700 font-semibold">Xóa</button>
+                  ` : ''}
+                  <button onclick="openProductDetailModal('${item.id}')" class="flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">Chi tiết</button>
+                  <button onclick="openProductSendModal('${item.id}')" class="flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 text-white shadow-sm">Gửi</button>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
       `;
     }
 
@@ -1650,11 +1982,10 @@
       const p = appState.products.find(x => x.id === id);
       if (!p) return;
       const priceExcl = Number(p.priceExclVat) || 0;
-      const vat = Number(p.vatAmount) || 0;
-      const priceIncl = priceExcl + vat;
+      const vatRate = Number(p.vatRate) || 0;
+      const priceIncl = Math.round(priceExcl * (1 + vatRate / 100));
       const regDateText = renderRegDateLine(p);
 
-      // Phân loại chuyên biệt theo loại sản phẩm
       let specialClassHtml = '';
       if (p.productType === 'Thuốc') {
         specialClassHtml = `
@@ -1678,17 +2009,24 @@
 
       const filesList = (p.dossierFiles && p.dossierFiles.length > 0)
         ? p.dossierFiles
-        : (p.fileUrl ? [{ id: 'main', label: 'Thư mục / Hồ sơ tổng hợp trên Drive', url: p.fileUrl }] : []);
+        : (p.fileUrl ? [{ id: 'main', label: 'Thư mục hồ sơ Google Drive', url: p.fileUrl }] : []);
 
       document.getElementById('detailModalTitle').textContent = `${p.name}`;
       document.getElementById('productDetailBody').innerHTML = `
+        <div class="flex items-center gap-3.5 pb-3 border-b border-slate-100 dark:border-slate-800">
+          ${renderProductImageHtml(p)}
+          <div>
+            <div class="font-extrabold text-base ${getProductNameColorClass(p.status)}">${escapeHtml(p.name)}</div>
+            <div class="text-xs text-slate-500 dark:text-slate-400">${escapeHtml(p.ingredient)}</div>
+          </div>
+        </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
           <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800"><strong>Phân nhóm sản phẩm:</strong> ${escapeHtml(p.groupName)}</div>
           <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800"><strong>Loại sản phẩm:</strong> ${escapeHtml(p.productType)}</div>
           <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800"><strong>Mã sản phẩm:</strong> ${escapeHtml(p.code)}</div>
           <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800"><strong>Dạng sử dụng:</strong> ${escapeHtml(p.usageRoute || 'Chưa cập nhật')}</div>
           <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 sm:col-span-2">
-            <strong>Thành phần:</strong> ${escapeHtml(p.ingredient)} • <strong>Quy cách:</strong> Hộp: ${escapeHtml(p.boxSpec || '—')} | Thùng: ${escapeHtml(p.cartonSpec || '—')}
+            <strong>Quy cách:</strong> Hộp: ${escapeHtml(p.boxSpec || '—')} | Thùng: ${escapeHtml(p.cartonSpec || '—')}
           </div>
           <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800">
             <strong>Số đăng ký:</strong> ${escapeHtml(p.regNumber)}
@@ -1699,7 +2037,6 @@
             <div class="mt-1 text-slate-400">Cập nhật: ${escapeHtml(p.statusUpdatedAt || 'Chưa rõ')}</div>
           </div>
 
-          <!-- Mã thuốc / Mã ATC chỉ hiển thị với Thuốc -->
           ${p.productType === 'Thuốc' ? `
             <div class="p-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-200 dark:border-indigo-800 sm:col-span-2">
               <strong>Mã thuốc / Mã ATC (WHO):</strong> ${escapeHtml(p.atcCode || 'Chưa cập nhật')} — ${escapeHtml(p.atcClass || '')}
@@ -1713,17 +2050,16 @@
           </div>
 
           <div class="p-3 rounded-xl bg-teal-50 dark:bg-teal-950/40 sm:col-span-2">
-            <strong>Chi tiết giá:</strong> Chưa VAT: <strong>${formatCurrencyVND(priceExcl)}</strong> • VAT: <strong>${formatCurrencyVND(vat)}</strong> • Có VAT: <strong>${formatCurrencyVND(priceIncl)}</strong>
+            <strong>Chi tiết giá:</strong> Chưa VAT: <strong>${formatCurrencyVND(priceExcl)}</strong> • VAT: <strong>${vatRate}%</strong> • Có VAT: <strong>${formatCurrencyVND(priceIncl)}</strong>
           </div>
 
-          <!-- Đường link dẫn tới nơi hồ sơ đang được lưu -->
           <div class="p-3.5 rounded-xl bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800 sm:col-span-2 space-y-2">
             <div class="flex flex-wrap items-center justify-between gap-2">
               <strong>Hồ sơ đang được lưu (Google Drive):</strong>
               <span class="text-[11px] text-slate-500 dark:text-slate-400">Cập nhật Drive: ${escapeHtml(formatDateDDMMYYYY(p.driveUpdatedAt) || 'N/A')}</span>
             </div>
             <div>
-              <a href="${escapeHtml(p.fileUrl)}" target="_blank" class="text-blue-700 dark:text-blue-400 font-semibold underline break-all">📁 Mở thư mục hồ sơ tổng hợp</a>
+              <a href="${escapeHtml(p.fileUrl || DRIVE_FOLDER_URL)}" target="_blank" class="text-blue-700 dark:text-blue-400 font-semibold underline break-all">📁 Mở thư mục hồ sơ Google Drive</a>
             </div>
             ${filesList.length > 0 ? `
               <div class="pt-1 border-t border-sky-200/70 dark:border-sky-800 space-y-1">
@@ -1747,7 +2083,7 @@
       document.getElementById('productDetailModal').classList.remove('hidden');
     }
 
-    // --- TAB 2: SLIDE ĐÀO TẠO ---
+    // --- TAB 2, 3, 4, 5 ---
     function renderTrainingSlides(container, highlightId) {
       container.innerHTML = `
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-200 dark:border-slate-800">
@@ -1782,7 +2118,6 @@
       `;
     }
 
-    // --- TAB 3: GDP NGÀNH DƯỢC ---
     function renderGdpForms(container, highlightId) {
       container.innerHTML = `
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-200 dark:border-slate-800">
@@ -1826,7 +2161,6 @@
       `;
     }
 
-    // --- TAB 4: PHÁP LÝ & KÊ KHAI GIÁ DƯỢC ---
     function renderLegalPricing(container, highlightId) {
       container.innerHTML = `
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-200 dark:border-slate-800">
@@ -1882,7 +2216,6 @@
       `;
     }
 
-    // --- TAB 5: Ý KIẾN ĐÓNG GÓP ---
     function renderFeedbackModule(container) {
       container.innerHTML = `
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-200 dark:border-slate-800">
@@ -1951,7 +2284,7 @@
       `;
     }
 
-    // -------------------- 10. SELECTION & GỬI KHÁCH (TÍCH CHỌN FILE CỤ THỂ + TRỰC TIẾP / LINK) --------------------
+    // -------------------- 10. SELECTION & GỬI KHÁCH --------------------
     function toggleProductSelection(id) {
       if (selectedProductIds.has(id)) selectedProductIds.delete(id);
       else selectedProductIds.add(id);
@@ -2174,7 +2507,6 @@
           fileObjs.push(dataUrlToFile(f.localDataUrl, safeName));
           continue;
         }
-        // Thử tải trực tiếp nếu link không bị chặn CORS
         const dlUrl = convertDriveToDirectDownloadUrl(f.url);
         if (dlUrl && !dlUrl.includes('/folders/')) {
           try {
@@ -2216,7 +2548,6 @@
           }
         }
 
-        // Trường hợp tệp lưu trên Google Drive (chặn CORS) hoặc dùng trên máy tính: tải thẳng tệp về máy từ đường link dẫn để thả vào Zalo gửi khách (không gửi đường link cho khách)
         if (fileObjs.length > 0) {
           fileObjs.forEach(fo => triggerDownload(fo, fo.name));
         } else {
@@ -2230,18 +2561,17 @@
           if (navigator.share) {
             try { await navigator.share({ title: 'Hồ sơ sản phẩm Sohaco', text }); return; } catch (e) {}
           }
-          showToast('Đã tải tệp hồ sơ & sao chép nội dung! Đang mở Zalo...');
+          showToast('Đã tải tệp & sao chép nội dung! Đang mở Zalo...');
           window.open('https://zalo.me/', '_blank');
         } else {
           document.getElementById('directFileDownloadNote').innerHTML =
-            '<strong>Chế độ gửi file trực tiếp:</strong> Hệ thống đã kích hoạt tải tệp từ đường dẫn về máy (và sao chép nội dung không kèm link). Bạn chỉ cần chọn Zalo hoặc Mail bên dưới rồi kéo/đính kèm tệp vừa tải gửi cho khách trong danh bạ.';
+            '<strong>Chế độ gửi file trực tiếp:</strong> Hệ thống đã kích hoạt tải tệp từ đường dẫn về máy (và sao chép nội dung không kèm link). Chọn Zalo hoặc Mail bên dưới rồi đính kèm tệp gửi thẳng cho khách.';
           document.getElementById('desktopShareOptions').classList.remove('hidden');
-          showToast('Đã chuẩn bị tệp tải về & sao chép nội dung!');
+          showToast('Đã chuẩn bị tệp & sao chép nội dung!');
         }
         return;
       }
 
-      // Chế độ gửi đường link
       if (isMobileDevice()) {
         if (navigator.share) {
           try {
@@ -2301,7 +2631,7 @@
       'Quy cách hộp',
       'Quy cách thùng',
       'Giá chưa có VAT (VNĐ)',
-      'Mức giá VAT (VNĐ)',
+      'Mức VAT áp dụng (%) (VD: 5 hoặc 8 hoặc 10)',
       'Số đăng ký',
       'Ngày hết hạn / Ngày tiếp nhận (YYYY-MM-DD)',
       'Mã ATC WHO (Chỉ dùng cho Thuốc)',
@@ -2312,24 +2642,25 @@
       'Ngày cập nhật Drive (YYYY-MM-DD)',
       'Phân loại 1 (Thuốc kê đơn/Không kê đơn | TPCN Kê khai giá/Không kê khai giá | TTBYT Loại A/B/C/D)',
       'Phân loại 2 (Thuốc thiết yếu/Không thiết yếu | TPCN Từ 0/1/6 tuổi trở lên)',
-      'Link tra cứu Cục QLD (Chỉ Thuốc)'
+      'Link tra cứu Cục QLD (Chỉ Thuốc)',
+      'Link ảnh sản phẩm (Tùy chọn)'
     ];
 
     function downloadSystemCatalogTemplate() {
       const sampleRows = [
         [
           'Nhóm 1.1', 'Thuốc', 'SHC-KS09', 'Sohaco-Amoxicillin 500mg', 'Amoxicillin 500mg', 'Đường uống',
-          'Hộp 10 vỉ x 10 viên nang', 'Thùng 60 hộp', 64762, 3238, 'VD-34567-25', '2030-06-30',
+          'Hộp 10 vỉ x 10 viên nang', 'Thùng 60 hộp', 64762, 5, 'VD-34567-25', '2030-06-30',
           'J01CA04', 'Kháng khuẩn nhóm Beta-lactam Penicillin (WHO)', 'Nhà thuốc; Quầy thuốc',
-          'Đang kinh doanh', 'https://drive.google.com/', '2026-11-18',
-          'Thuốc kê đơn', 'Thuốc thiết yếu', DAV_LOOKUP_URL
+          'Đang kinh doanh', DRIVE_FOLDER_URL, '2026-11-18',
+          'Thuốc kê đơn', 'Thuốc thiết yếu', DAV_LOOKUP_URL, ''
         ],
         [
           'Nhóm 2.1', 'Thực phẩm chức năng', 'SHC-TP15', 'Sohaco Kid Grow Calcium', 'Canxi hữu cơ + Vitamin D3', 'Đường uống',
-          'Hộp 20 ống x 10ml', 'Thùng 48 hộp', 134259, 10741, '7123/2026/ĐKSP', '',
+          'Hộp 20 ống x 10ml', 'Thùng 48 hộp', 134259, 8, '7123/2026/ĐKSP', '',
           '', '', 'Nhà thuốc; Quầy thuốc; Modern trade; General Trade',
-          'Đang kinh doanh', 'https://drive.google.com/', '2026-11-18',
-          'Không kê khai giá', 'Từ 1 tuổi trở lên', ''
+          'Đang kinh doanh', DRIVE_FOLDER_URL, '2026-11-18',
+          'Không kê khai giá', 'Từ 1 tuổi trở lên', '', ''
         ]
       ];
 
@@ -2347,7 +2678,7 @@
     function exportCatalogExcel() {
       const rows = appState.products.map(p => [
         p.groupName, p.productType, p.code, p.name, p.ingredient, p.usageRoute || '',
-        p.boxSpec || '', p.cartonSpec || '', Number(p.priceExclVat) || 0, Number(p.vatAmount) || 0,
+        p.boxSpec || '', p.cartonSpec || '', Number(p.priceExclVat) || 0, Number(p.vatRate) || 0,
         p.regNumber, p.regDate || '',
         p.productType === 'Thuốc' ? (p.atcCode || '') : '',
         p.productType === 'Thuốc' ? (p.atcClass || '') : '',
@@ -2355,7 +2686,8 @@
         p.fileUrl || '', p.driveUpdatedAt || '',
         p.productType === 'Thuốc' ? (p.prescriptionType || '') : (p.productType === 'Thực phẩm chức năng' ? (p.priceDeclStatus || '') : (p.productType === 'Thiết bị y tế' ? (p.deviceClass || '') : '')),
         p.productType === 'Thuốc' ? (p.essentialType || '') : (p.productType === 'Thực phẩm chức năng' ? (p.ageGroup || '') : ''),
-        p.productType === 'Thuốc' ? (p.davUrl || DAV_LOOKUP_URL) : ''
+        p.productType === 'Thuốc' ? (p.davUrl || DAV_LOOKUP_URL) : '',
+        p.imageUrl && !p.imageUrl.startsWith('data:') ? p.imageUrl : ''
       ]);
       if (window.XLSX) {
         const ws = XLSX.utils.aoa_to_sheet([CATALOG_TEMPLATE_HEADERS, ...rows]);
@@ -2415,7 +2747,11 @@
             const channels = String(r[14] || '').split(/[;,]/).map(s => s.trim()).filter(Boolean);
             const stRaw = String(r[15] || 'Đang kinh doanh').trim();
             const status = STATUS_OPTIONS.includes(stRaw) ? stRaw : 'Đang kinh doanh';
-            const driveLink = String(r[16] || '').trim();
+            const driveLink = String(r[16] || DRIVE_FOLDER_URL).trim() || DRIVE_FOLDER_URL;
+
+            let vatRaw = String(r[9] || '0').replace('%', '').trim();
+            let vatRate = parseFloat(vatRaw) || 0;
+            if (vatRate > 0 && vatRate < 1) vatRate = Math.round(vatRate * 100);
 
             const item = {
               id: 'sp_' + Date.now() + '_' + i,
@@ -2424,11 +2760,14 @@
               code: String(r[2] || ('SHC-' + i)).trim(),
               name,
               ingredient: String(r[4] || '').trim(),
+              imageUrl: String(r[21] || '').trim(),
+              imageSizePx: 52,
+              imageFit: 'contain',
               usageRoute: String(r[5] || '').trim(),
               boxSpec: String(r[6] || '').trim(),
               cartonSpec: String(r[7] || '').trim(),
               priceExclVat: Number(String(r[8] || '0').replace(/[^\d.-]/g, '')) || 0,
-              vatAmount: Number(String(r[9] || '0').replace(/[^\d.-]/g, '')) || 0,
+              vatRate,
               regNumber: String(r[10] || '').trim(),
               regDate: pType === 'Thực phẩm chức năng' ? '' : toInputDateYYYYMMDD(String(r[11] || '').trim()),
               atcCode: pType === 'Thuốc' ? String(r[12] || '').trim() : '',
@@ -2438,7 +2777,7 @@
               statusUpdatedAt: nowStr,
               fileUrl: driveLink,
               driveUpdatedAt: toInputDateYYYYMMDD(String(r[17] || '').trim()) || new Date().toISOString().slice(0, 10),
-              dossierFiles: driveLink ? [{ id: 'df_' + i, label: 'Hồ sơ sản phẩm (Google Drive)', url: driveLink }] : [],
+              dossierFiles: [{ id: 'df_' + i, label: 'Hồ sơ sản phẩm (Google Drive)', url: driveLink }],
               davUrl: pType === 'Thuốc' ? (String(r[20] || DAV_LOOKUP_URL).trim() || DAV_LOOKUP_URL) : ''
             };
 
@@ -2470,7 +2809,7 @@
             appState.products = imported;
           }
 
-          saveState();
+          saveState(true);
           renderTabsAndWorkspace();
           showToast(`Đã cập nhật ${imported.length} sản phẩm từ file Excel/CSV!`);
         } catch (err) {
@@ -2509,7 +2848,7 @@
 
       const newFb = { id: 'fb_' + Date.now(), sender, department: dept, topic, content, createdAt };
       appState.feedbacks.unshift(newFb);
-      saveState();
+      saveState(true);
 
       if (appState.googleAppsScriptUrl) {
         try {
@@ -2517,7 +2856,7 @@
             method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newFb)
           });
           showToast('Đã gửi góp ý & đồng bộ lên Google Sheets!');
-        } catch (err) { showToast('Đã lưu góp ý cục bộ.'); }
+        } catch (err) { showToast('Đã lưu góp ý.'); }
       } else {
         showToast('Đã ghi nhận ý kiến đóng góp thành công!');
       }
@@ -2527,7 +2866,7 @@
     function saveGoogleSheetConfig() {
       appState.googleSheetUrl = document.getElementById('cfgSheetUrl').value.trim() || 'https://docs.google.com/spreadsheets/';
       appState.googleAppsScriptUrl = document.getElementById('cfgScriptUrl').value.trim();
-      saveState();
+      saveState(true);
       showToast('Đã lưu liên kết Google Sheets!');
     }
 
@@ -2545,7 +2884,7 @@
       showToast(`Đã xuất file ${filename}`);
     }
 
-    // -------------------- 13. ADMIN CRUD MODAL (QUẢN LÝ ĐẦY ĐỦ & DANH SÁCH FILE CON) --------------------
+    // -------------------- 13. ADMIN CRUD MODAL --------------------
     const MODULE_SCHEMAS = {
       'training-slides': {
         key: 'trainingSlides',
@@ -2587,11 +2926,13 @@
     };
 
     let _draftDossierFiles = [];
+    let _draftProductImage = { url: '', sizePx: 52, fit: 'contain' };
 
     function getProductFieldsByType(pType) {
       const fields = [
         { name: 'productType', label: 'Loại sản phẩm', type: 'select', options: PRODUCT_TYPES, required: true, onChange: 'onAdminProductTypeChange(this.value)' },
         { name: 'groupName', label: 'Phân nhóm sản phẩm', type: 'select', options: PRODUCT_GROUPS, required: true },
+        { name: 'productImageEditor', label: 'Hình ảnh sản phẩm & Tùy chỉnh kích thước hiển thị (Resize)', type: 'productImage' },
         { name: 'code', label: 'Mã sản phẩm', required: true },
         { name: 'name', label: 'Tên sản phẩm', required: true },
         { name: 'ingredient', label: 'Thành phần / Hoạt chất', required: true },
@@ -2599,7 +2940,7 @@
         { name: 'boxSpec', label: 'Quy cách hộp', required: true },
         { name: 'cartonSpec', label: 'Quy cách thùng', required: true },
         { name: 'priceExclVat', label: 'Giá bán chưa có VAT (VNĐ)', type: 'number', required: true },
-        { name: 'vatAmount', label: 'Mức giá VAT (VNĐ)', type: 'number', required: true },
+        { name: 'vatRate', label: 'Mức VAT áp dụng (%) (VD: 5, 8, 10)', type: 'number', required: true },
         { name: 'regNumber', label: 'Số đăng ký / Số lưu hành', required: true }
       ];
 
@@ -2639,6 +2980,58 @@
       return fields;
     }
 
+    function renderProductImageEditorHtml() {
+      const sz = Math.max(36, Math.min(120, Number(_draftProductImage.sizePx) || 52));
+      const fit = _draftProductImage.fit === 'cover' ? 'object-cover' : 'object-contain';
+      return `
+        <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 space-y-2.5">
+          <div class="flex flex-wrap items-center gap-3">
+            <div style="width: ${sz}px; height: ${sz}px;" class="rounded-xl border border-slate-300 dark:border-slate-600 bg-white overflow-hidden flex items-center justify-center shrink-0">
+              ${_draftProductImage.url ? `<img src="${escapeHtml(_draftProductImage.url)}" class="w-full h-full ${fit}" />` : `<span class="text-[10px] text-slate-400">Chưa có ảnh</span>`}
+            </div>
+            <div class="flex-1 min-w-[200px] space-y-2">
+              <div class="flex flex-wrap gap-2">
+                <label class="px-3 py-1.5 rounded-lg bg-sky-700 hover:bg-sky-800 text-white text-xs font-bold cursor-pointer">
+                  Tải ảnh sản phẩm lên
+                  <input type="file" accept="image/*" class="hidden" onchange="handleDraftProductImageUpload(event)" />
+                </label>
+                ${_draftProductImage.url ? `<button type="button" onclick="_draftProductImage.url=''; refreshProductImageEditor();" class="px-2.5 py-1.5 rounded-lg bg-rose-100 text-rose-700 text-xs font-bold">Xóa ảnh</button>` : ''}
+              </div>
+              <input type="text" placeholder="Hoặc dán link URL ảnh sản phẩm..." value="${escapeHtml(_draftProductImage.url)}" oninput="_draftProductImage.url=this.value" class="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs" />
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center gap-4 pt-2 border-t border-slate-200 dark:border-slate-700 text-xs">
+            <div class="flex items-center gap-2">
+              <span class="font-semibold text-slate-600 dark:text-slate-300">Phóng to / Thu nhỏ ảnh:</span>
+              <input type="range" min="36" max="120" step="4" value="${sz}" oninput="_draftProductImage.sizePx=Number(this.value); refreshProductImageEditor();" class="w-28 accent-sky-600 cursor-pointer" />
+              <span class="font-bold text-sky-700 dark:text-sky-400 w-10">${sz}px</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="font-semibold text-slate-600 dark:text-slate-300">Kiểu khung:</span>
+              <select onchange="_draftProductImage.fit=this.value; refreshProductImageEditor();" class="rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-2 py-1 text-xs">
+                <option value="contain" ${_draftProductImage.fit === 'contain' ? 'selected' : ''}>Vừa khung (Không cắt)</option>
+                <option value="cover" ${_draftProductImage.fit === 'cover' ? 'selected' : ''}>Lấp đầy khung</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function refreshProductImageEditor() {
+      const slot = document.getElementById('productImageEditorSlot');
+      if (slot) slot.innerHTML = renderProductImageEditorHtml();
+    }
+
+    function handleDraftProductImageUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      compressImageToDataUrl(file, 360, (dataUrl) => {
+        _draftProductImage.url = dataUrl;
+        refreshProductImageEditor();
+      });
+    }
+
     function renderDossierFilesEditorHtml() {
       return `
         <div class="space-y-2 bg-slate-50 dark:bg-slate-800 p-3 rounded-xl border border-slate-200 dark:border-slate-700">
@@ -2661,7 +3054,7 @@
     }
 
     function addDraftDossierFile() {
-      _draftDossierFiles.push({ id: 'df_' + Date.now(), label: '', url: '' });
+      _draftDossierFiles.push({ id: 'df_' + Date.now(), label: '', url: DRIVE_FOLDER_URL });
       const slot = document.getElementById('dossierFilesEditorSlot');
       if (slot) slot.innerHTML = renderDossierFilesEditorHtml();
     }
@@ -2694,6 +3087,15 @@
       return fields.map(f => {
         let val = valuesObj?.[f.name] ?? '';
         if (f.type === 'date') val = toInputDateYYYYMMDD(val);
+
+        if (f.type === 'productImage') {
+          return `
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">${f.label}</label>
+              <div id="productImageEditorSlot">${renderProductImageEditorHtml()}</div>
+            </div>
+          `;
+        }
 
         if (f.type === 'dossierFiles') {
           return `
@@ -2735,7 +3137,7 @@
         return `
           <div>
             <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">${f.label} ${f.required ? '<span class="text-rose-500">*</span>' : ''}</label>
-            <input type="${f.type === 'date' ? 'date' : (f.type === 'number' ? 'number' : 'text')}" ${f.type === 'number' ? 'min="0" step="1"' : ''} name="${f.name}" ${f.required ? 'required' : ''} value="${escapeHtml(val)}" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm focus:border-sky-500 focus:outline-none" />
+            <input type="${f.type === 'date' ? 'date' : (f.type === 'number' ? 'number' : 'text')}" ${f.type === 'number' ? 'min="0" step="any"' : ''} name="${f.name}" ${f.required ? 'required' : ''} value="${escapeHtml(val)}" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm focus:border-sky-500 focus:outline-none" />
           </div>
         `;
       }).join('');
@@ -2770,13 +3172,22 @@
               groupName: 'Nhóm 1.1',
               status: 'Đang kinh doanh',
               priceExclVat: 0,
-              vatAmount: 0,
+              vatRate: 5,
+              imageUrl: '',
+              imageSizePx: 52,
+              imageFit: 'contain',
               channels: ['Nhà thuốc', 'Quầy thuốc'],
               davUrl: defaultType === 'Thuốc' ? DAV_LOOKUP_URL : '',
+              fileUrl: DRIVE_FOLDER_URL,
               driveUpdatedAt: new Date().toISOString().slice(0, 10),
-              dossierFiles: [{ id: 'df_1', label: 'Giấy lưu hành / SĐK', url: '' }]
+              dossierFiles: [{ id: 'df_1', label: 'Giấy lưu hành / SĐK', url: DRIVE_FOLDER_URL }]
             };
         _draftDossierFiles = structuredClone(existing.dossierFiles || []);
+        _draftProductImage = {
+          url: existing.imageUrl || '',
+          sizePx: Number(existing.imageSizePx) || 52,
+          fit: existing.imageFit || 'contain'
+        };
         document.getElementById('adminModalTitle').textContent = (itemId ? 'Chỉnh sửa: ' : 'Thêm mới: ') + 'Sản phẩm';
         const fields = getProductFieldsByType(existing.productType || 'Thuốc');
         document.getElementById('adminFormFields').innerHTML = renderAdminFieldsHtml(fields, existing);
@@ -2813,6 +3224,10 @@
             newObj.channels = formData.getAll('channels').map(s => s.toString());
           } else if (f.type === 'dossierFiles') {
             newObj.dossierFiles = _draftDossierFiles.filter(df => (df.label || '').trim() || (df.url || '').trim() || df.localDataUrl);
+          } else if (f.type === 'productImage') {
+            newObj.imageUrl = _draftProductImage.url || '';
+            newObj.imageSizePx = Number(_draftProductImage.sizePx) || 52;
+            newObj.imageFit = _draftProductImage.fit || 'contain';
           } else if (f.type === 'number') {
             newObj[f.name] = Number(formData.get(f.name)) || 0;
           } else {
@@ -2837,7 +3252,7 @@
           appState.products.unshift(newObj);
         }
 
-        saveState();
+        saveState(true);
         closeModal('adminItemModal');
         renderTabsAndWorkspace();
         showToast('Đã lưu thông tin sản phẩm thành công!');
@@ -2860,7 +3275,7 @@
         appState[schema.key].unshift(newObj);
       }
 
-      saveState();
+      saveState(true);
       closeModal('adminItemModal');
       renderTabsAndWorkspace();
       showToast('Đã lưu cập nhật dữ liệu thành công!');
@@ -2869,7 +3284,7 @@
     function deleteItem(stateKey, id) {
       if (!confirm('Bạn có chắc muốn xóa mục này?')) return;
       appState[stateKey] = appState[stateKey].filter(x => x.id !== id);
-      saveState();
+      saveState(true);
       renderTabsAndWorkspace();
       showToast('Đã xóa mục khỏi hệ thống');
     }
@@ -2899,7 +3314,7 @@
       if (!confirm('Khôi phục lại toàn bộ dữ liệu mẫu ban đầu?')) return;
       localStorage.removeItem(STORAGE_KEY);
       appState = structuredClone(DEFAULT_DATA);
-      saveState();
+      saveState(false);
       renderLogo();
       renderTabsAndWorkspace();
       showToast('Đã khôi phục dữ liệu mẫu');
@@ -2930,7 +3345,8 @@
 
     // Boot
     initUserTheme();
-    initOnlinePresence();
+    updateSyncBadge();
+    initOnlineAndCloudSync();
     renderLogo();
     updateStats();
     updateAdminUI();
